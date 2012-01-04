@@ -52,21 +52,23 @@ AudioBufferList *gInputIOBuffer = NULL;
 #define kSecondsInRingBuffer 2.
 
 AudioThruEngine::AudioThruEngine() : 
-	mWorkBuf(NULL),
 	mRunning(false),
 	mMuting(false),
 	mThruing(true),
 	mBufferSize(512),
 	mExtraLatencyFrames(0),
 	mInputLoad(0.),
-	mOutputLoad(0.)
+	mOutputLoad(0.),
+    mWorkBuf(NULL),
+    mEqualizerEnabled(false),
+    mVirtualizerEnabled(false)
 {
 //	mErrorMessage[0] = '\0';
 	mInputBuffer = new AudioRingBuffer(4, 88200);
 	
 	// init routing map to default chan->chan
 	for (int i = 0; i < 16; i++)
-		mChannelMap[i] = i;		
+		mChannelMap[i] = i;
 }
 
 AudioThruEngine::~AudioThruEngine()
@@ -138,13 +140,29 @@ OSStatus AudioThruEngine::MatchSampleRate(bool useInputDevice)
 	}
     
     mSampleRate = mInputDevice.mFormat.mSampleRate;
-    UpdatedSampleRate();
+    
+    UpdateDSP();
 	return status;
 }
 
-void    AudioThruEngine::UpdatedSampleRate()
+void    AudioThruEngine::UpdateDSP()
 {
-    mHeadsetBiquad.setHighShelf(0, 800.0, mSampleRate, -11.0, 0.72, 0);
+    mEffectVirtualizer.configure(mSampleRate);
+    mEffectEqualizer.configure(mSampleRate);
+}
+
+void    AudioThruEngine::SetVirtualizer(bool enabled, int16_t strength) {
+    mVirtualizerEnabled = enabled;
+    mEffectVirtualizer.setStrength(strength);
+}
+
+void    AudioThruEngine::SetEqualizer(bool enabled, float *bands, float loudnessCorrection)
+{
+    mEqualizerEnabled = enabled;
+    for (int i = 0; i < 6; i ++) {
+        mEffectEqualizer.setBand(i, bands[i]);
+    }
+    mEffectEqualizer.setLoudnessCorrection(loudnessCorrection);
 }
 
 void	AudioThruEngine::Start()
@@ -164,7 +182,7 @@ void	AudioThruEngine::Start()
 
 	mInputBuffer->Allocate(mInputDevice.mFormat.mBytesPerFrame, UInt32(kSecondsInRingBuffer * mInputDevice.mFormat.mSampleRate));
 	mSampleRate = mInputDevice.mFormat.mSampleRate;
-    UpdatedSampleRate();
+    UpdateDSP();
 	
 	mWorkBuf = new Byte[mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame];
 	memset(mWorkBuf, 0, mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame);
@@ -315,7 +333,7 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
             }
 			UInt32 outnchnls = outOutputData->mBuffers[buf].mNumberChannels;
             
-            if (This->mHeadsetFiltering && innchnls == 2 && outnchnls == 2) {
+            if (innchnls == 2 && outnchnls == 2) {
                 UInt32 outChan1 = This->GetChannelMap(0) - chanstart[0];
                 UInt32 outChan2 = This->GetChannelMap(1) - chanstart[1];
                 if (outChan1 < outnchnls && outChan2 < outnchnls) {
@@ -328,11 +346,12 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
                         float l = in[0];
                         float r = in[1];
                         
-                        float center = l + r;
-                        float side = l - r;
-                        side -= This->mHeadsetBiquad.process(side);
-                        l = (center + side) * .5f;
-                        r = (center - side) * .5f;
+                        if (This->mVirtualizerEnabled) {
+                            This->mEffectVirtualizer.process(l, r);
+                        }
+                        if (This->mEqualizerEnabled) {
+                            This->mEffectEqualizer.process(l, r);
+                        }
                         
                         out[0     ] += l;
                         out[outIdx] += r;

@@ -673,7 +673,17 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 - (IBAction)headsetSelected:(id)sender
 {
     [sender setState:![sender state]];
-    gThruEngine2->SetHeadsetFiltering([sender state]);
+    gThruEngine2->SetVirtualizer([sender state], 500);
+}
+
+- (IBAction)equalizerChanged:(id)sender
+{
+    float presets[][6] = {
+        { 0, 0, 0, 0, 0 }
+    };
+    int preset = 0;
+    int loudnessCorrection = 100;
+    gThruEngine2->SetEqualizer(preset != 0 && loudnessCorrection != 100, presets[preset], loudnessCorrection);
 }
 
 - (void)doNothing

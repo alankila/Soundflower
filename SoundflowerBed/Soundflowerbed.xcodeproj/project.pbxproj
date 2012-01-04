@@ -30,8 +30,14 @@
 		222FE34A0EBB6D9900FD13FC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F591DD8D0310AAC801FEEC38 /* CoreAudio.framework */; };
 		222FE34B0EBB6D9900FD13FC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9E9CD2F08E78DA30024DA5B /* IOKit.framework */; };
 		22952B1F104EC967003AF61F /* Soundflower.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 22952B1E104EC967003AF61F /* Soundflower.xcconfig */; };
+		9518870714B511C7004C4A69 /* DelayLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9518870514B511C7004C4A69 /* DelayLine.cpp */; };
+		9518870814B511C7004C4A69 /* DelayLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9518870614B511C7004C4A69 /* DelayLine.h */; };
 		9571CC2E14B505F200569B69 /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC2C14B505F100569B69 /* Biquad.cpp */; };
 		9571CC2F14B505F200569B69 /* Biquad.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC2D14B505F100569B69 /* Biquad.h */; };
+		9571CC3514B5111600569B69 /* EffectEqualizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC3114B5111600569B69 /* EffectEqualizer.cpp */; };
+		9571CC3614B5111600569B69 /* EffectEqualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3214B5111600569B69 /* EffectEqualizer.h */; };
+		9571CC3714B5111600569B69 /* EffectVirtualizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */; };
+		9571CC3814B5111600569B69 /* EffectVirtualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3414B5111600569B69 /* EffectVirtualizer.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,8 +50,14 @@
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		9518870514B511C7004C4A69 /* DelayLine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DelayLine.cpp; sourceTree = "<group>"; };
+		9518870614B511C7004C4A69 /* DelayLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelayLine.h; sourceTree = "<group>"; };
 		9571CC2C14B505F100569B69 /* Biquad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Biquad.cpp; sourceTree = "<group>"; };
 		9571CC2D14B505F100569B69 /* Biquad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Biquad.h; sourceTree = "<group>"; };
+		9571CC3114B5111600569B69 /* EffectEqualizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EffectEqualizer.cpp; sourceTree = "<group>"; };
+		9571CC3214B5111600569B69 /* EffectEqualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectEqualizer.h; sourceTree = "<group>"; };
+		9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EffectVirtualizer.cpp; sourceTree = "<group>"; };
+		9571CC3414B5111600569B69 /* EffectVirtualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectVirtualizer.h; sourceTree = "<group>"; };
 		C9CCA5E606ED143E0076FAC2 /* sf16.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sf16.tiff; sourceTree = "<group>"; };
 		C9CCA5E706ED143E0076FAC2 /* sf2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sf2.tiff; sourceTree = "<group>"; };
 		C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = menuIcon.tiff; sourceTree = "<group>"; };
@@ -83,8 +95,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9571CC2C14B505F100569B69 /* Biquad.cpp */,
-				9571CC2D14B505F100569B69 /* Biquad.h */,
+				9518870914B515FE004C4A69 /* DSP */,
 				F591DD850310A6BE01FEEC38 /* AppController.h */,
 				F591DD860310A6BE01FEEC38 /* AppController.mm */,
 				F57307580312E91E01FEEC38 /* HelpWindowController.h */,
@@ -172,6 +183,21 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		9518870914B515FE004C4A69 /* DSP */ = {
+			isa = PBXGroup;
+			children = (
+				9518870514B511C7004C4A69 /* DelayLine.cpp */,
+				9518870614B511C7004C4A69 /* DelayLine.h */,
+				9571CC3114B5111600569B69 /* EffectEqualizer.cpp */,
+				9571CC3214B5111600569B69 /* EffectEqualizer.h */,
+				9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */,
+				9571CC3414B5111600569B69 /* EffectVirtualizer.h */,
+				9571CC2C14B505F100569B69 /* Biquad.cpp */,
+				9571CC2D14B505F100569B69 /* Biquad.h */,
+			);
+			name = DSP;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -186,6 +212,9 @@
 				222FE3370EBB6D9900FD13FC /* AudioRingBuffer.h in Headers */,
 				222FE3380EBB6D9900FD13FC /* HelpWindowController.h in Headers */,
 				9571CC2F14B505F200569B69 /* Biquad.h in Headers */,
+				9571CC3614B5111600569B69 /* EffectEqualizer.h in Headers */,
+				9571CC3814B5111600569B69 /* EffectVirtualizer.h in Headers */,
+				9518870814B511C7004C4A69 /* DelayLine.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -262,6 +291,9 @@
 				222FE3460EBB6D9900FD13FC /* AudioDeviceList.cpp in Sources */,
 				222FE3470EBB6D9900FD13FC /* HelpWindowController.m in Sources */,
 				9571CC2E14B505F200569B69 /* Biquad.cpp in Sources */,
+				9571CC3514B5111600569B69 /* EffectEqualizer.cpp in Sources */,
+				9571CC3714B5111600569B69 /* EffectVirtualizer.cpp in Sources */,
+				9518870714B511C7004C4A69 /* DelayLine.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

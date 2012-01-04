@@ -92,7 +92,7 @@ int		AudioDevice::CountChannels()
 	OSStatus err;
 	UInt32 propSize;
 	int result = 0;
-	
+
 	err = AudioDeviceGetPropertyInfo(mID, 0, mIsInput, kAudioDevicePropertyStreamConfiguration, &propSize, NULL);
 	if (err) return 0;
 

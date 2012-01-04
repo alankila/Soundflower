@@ -44,7 +44,8 @@
 #define __AudioThruEngine_h__
 
 #include "AudioDevice.h"
-#include "Biquad.h"
+#include "EffectVirtualizer.h"
+#include "EffectEqualizer.h"
 
 class AudioRingBuffer;
 
@@ -80,8 +81,9 @@ public:
 	void	SetChannelMap(int ch, int val) { mChannelMap[ch] = val; }
 	int		GetChannelMap(int ch) { return mChannelMap[ch]; }
 
-    /* DSP API */
-    void    SetHeadsetFiltering(bool enabled) { mHeadsetFiltering = enabled; }
+    /* Public DSP API */
+    void    SetVirtualizer(bool enabled, int16_t strength);
+    void    SetEqualizer(bool enabled, float bands[6], float loudnessCorrection);
 protected:
 	enum IOProcState {
 		kOff,
@@ -136,11 +138,13 @@ protected:
 
 	Byte			*mWorkBuf;
     
-    /* DSP members and methods */
-    void    UpdatedSampleRate();
+    /* Private DSP API & members */
+    void              UpdateDSP();
     
-    bool            mHeadsetFiltering;
-    Biquad          mHeadsetBiquad;
+    bool              mEqualizerEnabled;
+    EffectEqualizer   mEffectEqualizer;
+    bool              mVirtualizerEnabled;
+    EffectVirtualizer mEffectVirtualizer;
 };
 
 
