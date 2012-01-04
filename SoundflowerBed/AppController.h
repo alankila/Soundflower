@@ -5,7 +5,7 @@
 #include "AudioDeviceList.h"
 
 
-@interface AppController : NSObject
+@interface AppController : NSObject<NSApplicationDelegate>
 {
 	NSStatusItem	*mSbItem;
 	NSMenu			*mMenu;
