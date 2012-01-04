@@ -9,16 +9,22 @@
 {
 	NSStatusItem	*mSbItem;
 	NSMenu			*mMenu;
+    /* The "2ch menu" */
 	NSMenuItem		*m2chMenu;
+    /* The menu that gives 2ch buffer choices */
+    NSMenu          *m2chBuffer;
+    /* The "16ch menu" */
 	NSMenuItem		*m16chMenu;
-	NSMenu			*m2chBuffer;
-	NSMenu			*m16chBuffer;
+    /* The menu that gives 2ch buffer choices */
+    NSMenu          *m16chBuffer;
     
 	BOOL			menuItemVisible;
 	int				m16StartIndex;
 	
 	NSMenuItem		*mCur2chDevice;
+	NSMenuItem		*mCur2chBuffer;
 	NSMenuItem		*mCur16chDevice;
+	NSMenuItem		*mCur16chBuffer;
 	
 	NSMenuItem		*mSuspended2chDevice;
 	NSMenuItem		*mSuspended16chDevice;
@@ -51,8 +57,6 @@
 - (IBAction)outputDeviceSelected:(id)sender;
 - (IBAction)bufferSizeChanged2ch:(id)sender;
 - (IBAction)bufferSizeChanged16ch:(id)sender;
-- (IBAction)cloningChanged:(id)sender; //iSchemy
-- (IBAction)cloningChanged:(id)sender cloneChannels:(bool)clone; //here too
 - (IBAction)routingChanged2ch:(id)sender;
 - (IBAction)routingChanged16ch:(id)sender;
 
@@ -68,14 +72,5 @@
 
 - (void)readDevicePrefs:(BOOL)is2ch;
 - (void)writeDevicePrefs:(BOOL)is2ch;
-
-//- (IBAction)inputLoadChanged:(id)sender;
-//- (IBAction)outputLoadChanged:(id)sender;
-//- (IBAction)extraLatencyChanged:(id)sender;
-//- (IBAction)toggleThru:(id)sender;
-//- (IBAction)inputDeviceSelected:(id)sender;
-//- (IBAction)inputSourceSelected:(id)sender;
-//- (IBAction)outputSourceSelected:(id)sender;
-//- (void)updateActualLatency:(NSTimer *)timer;
 
 @end
