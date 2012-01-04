@@ -136,8 +136,15 @@ OSStatus AudioThruEngine::MatchSampleRate(bool useInputDevice)
 			
 		printf("reset sample rate\n");	
 	}
-
+    
+    mSampleRate = mInputDevice.mFormat.mSampleRate;
+    UpdatedSampleRate();
 	return status;
+}
+
+void    AudioThruEngine::UpdatedSampleRate()
+{
+    mHeadsetBiquad.setHighShelf(0, 800.0, mSampleRate, -11.0, 0.72, 0);
 }
 
 void	AudioThruEngine::Start()
@@ -157,6 +164,7 @@ void	AudioThruEngine::Start()
 
 	mInputBuffer->Allocate(mInputDevice.mFormat.mBytesPerFrame, UInt32(kSecondsInRingBuffer * mInputDevice.mFormat.mSampleRate));
 	mSampleRate = mInputDevice.mFormat.mSampleRate;
+    UpdatedSampleRate();
 	
 	mWorkBuf = new Byte[mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame];
 	memset(mWorkBuf, 0, mInputDevice.mBufferSizeFrames * mInputDevice.mFormat.mBytesPerFrame);
@@ -300,35 +308,61 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 				
 		UInt32 innchnls = This->mInputDevice.mFormat.mChannelsPerFrame;
 		
-		UInt32* chanstart = new UInt32[16];
-			
-		for (UInt32 buf = 0; buf < outOutputData->mNumberBuffers; buf++)
-		{
-			for (int i = 0; i < 16; i++)
+		UInt32 chanstart[16];
+        for (UInt32 buf = 0; buf < outOutputData->mNumberBuffers; buf ++) {
+			for (int i = 0; i < 16; i++) {
 				chanstart[i] = 0;
+            }
 			UInt32 outnchnls = outOutputData->mBuffers[buf].mNumberChannels;
-			for (UInt32 chan = 0; chan < innchnls; chan ++)
-			{
-				UInt32 outChan = This->GetChannelMap(chan) - chanstart[chan];		
-				if (outChan < outnchnls)
-				{
-					// odd-even
-					float *in = (float *)This->mWorkBuf + (chan % innchnls); 
-					float *out = (float *)outOutputData->mBuffers[buf].mData + outChan;		
-					int frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
+            
+            if (This->mHeadsetFiltering && innchnls == 2 && outnchnls == 2) {
+                UInt32 outChan1 = This->GetChannelMap(0) - chanstart[0];
+                UInt32 outChan2 = This->GetChannelMap(1) - chanstart[1];
+                if (outChan1 < outnchnls && outChan2 < outnchnls) {
+                    float *in = (float *) This->mWorkBuf;
+                    float *out = (float *) outOutputData->mBuffers[buf].mData + outChan1;
+                    SInt32 outIdx = outChan2 - outChan1;
 
-					for (UInt32 frame = 0; frame < frames; frame += 1)
-					{
-						*out += *in;
-						in += innchnls;
-						out += outnchnls;
-					}
-				}
-				chanstart[chan] += outnchnls;
+                    UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
+                    for (UInt32 frame = 0; frame < frames; frame += 1) {
+                        float l = in[0];
+                        float r = in[1];
+                        
+                        float center = l + r;
+                        float side = l - r;
+                        side -= This->mHeadsetBiquad.process(side);
+                        l = (center + side) * .5f;
+                        r = (center - side) * .5f;
+                        
+                        out[0     ] += l;
+                        out[outIdx] += r;
+                        
+                        in += innchnls;
+                        out += outnchnls;
+                    }
+                }
+                    
+                chanstart[0] += outnchnls;
+                chanstart[1] += outnchnls;
+            } else {
+                for (UInt32 chan = 0; chan < innchnls; chan ++) {
+                    UInt32 outChan = This->GetChannelMap(chan) - chanstart[chan];		
+                    if (outChan < outnchnls) {
+                        float *in = (float *) This->mWorkBuf + (chan % innchnls); 
+                        float *out = (float *) outOutputData->mBuffers[buf].mData + outChan;		
+                        UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
+
+                        for (UInt32 frame = 0; frame < frames; frame += 1) {
+                            *out += *in;
+                            in += innchnls;
+                            out += outnchnls;
+                        }
+                    }
+                
+                    chanstart[chan] += outnchnls;
+                }
 			}
 		}
-		
-		delete [] chanstart;
 		
 		This->mThruTime = delta;
 		

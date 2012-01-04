@@ -25,6 +25,7 @@
 	NSMenuItem		*mCur2chBuffer;
 	NSMenuItem		*mCur16chDevice;
 	NSMenuItem		*mCur16chBuffer;
+    NSMenuItem      *mCur2chHeadsetFiltering;
 	
 	NSMenuItem		*mSuspended2chDevice;
 	NSMenuItem		*mSuspended16chDevice;

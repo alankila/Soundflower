@@ -44,6 +44,7 @@
 #define __AudioThruEngine_h__
 
 #include "AudioDevice.h"
+#include "Biquad.h"
 
 class AudioRingBuffer;
 
@@ -76,14 +77,11 @@ public:
 	
 	OSStatus	MatchSampleRate(bool useInputDevice);
 	
-	// valid values are 0 to nchnls-1;  -1 = off
 	void	SetChannelMap(int ch, int val) { mChannelMap[ch] = val; }
 	int		GetChannelMap(int ch) { return mChannelMap[ch]; }
-	
-//	char *	GetErrorMessage() { return mErrorMessage; }
 
-	Byte			*mWorkBuf;
-	
+    /* DSP API */
+    void    SetHeadsetFiltering(bool enabled) { mHeadsetFiltering = enabled; }
 protected:
 	enum IOProcState {
 		kOff,
@@ -91,9 +89,7 @@ protected:
 		kRunning,
 		kStopRequested
 	};
-	
-//	void	ApplyLoad(double load);
-
+    
 	static OSStatus InputIOProc (	AudioDeviceID			inDevice,
 									const AudioTimeStamp*	inNow,
 									const AudioBufferList*	inInputData,
@@ -137,7 +133,14 @@ protected:
 	
 	int				mChannelMap[16];
 	AudioDeviceIOProc mOutputIOProc;
-	//char			mErrorMessage[128];
+
+	Byte			*mWorkBuf;
+    
+    /* DSP members and methods */
+    void    UpdatedSampleRate();
+    
+    bool            mHeadsetFiltering;
+    Biquad          mHeadsetBiquad;
 };
 
 

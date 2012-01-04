@@ -413,6 +413,8 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     [item setTarget:self];	
 		
     [submenu addItem:[NSMenuItem separatorItem]];
+    mCur2chHeadsetFiltering = [submenu addItemWithTitle:@"Headset filtering" action:@selector(headsetSelected:) keyEquivalent:@""];
+    [mCur2chHeadsetFiltering setTarget:self];
     
     [m2chMenu setSubmenu:submenu];
 
@@ -474,7 +476,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     }
 		
     [mMenu addItem:[NSMenuItem separatorItem]];
-	
+
 	item = [mMenu addItemWithTitle:@"Audio Setup..." action:@selector(doAudioSetup) keyEquivalent:@""];
 	[item setTarget:self];
 	
@@ -668,6 +670,12 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	}
 }
 
+- (IBAction)headsetSelected:(id)sender
+{
+    [sender setState:![sender state]];
+    gThruEngine2->SetHeadsetFiltering([sender state]);
+}
+
 - (void)doNothing
 {
 }
@@ -709,6 +717,15 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
         v = @"512";
     }
     [self bufferSizeChanged16ch:[m16chBuffer itemWithTitle:v]];
+    
+    v = [defaults valueForKey:@"headsetFiltering"];
+    if (! v) {
+        v = @"0";
+    }
+    /* State will be flipped by headsetSelected, so it appears inverted here. */
+    mCur2chHeadsetFiltering.state = [v intValue] ? NSOffState : NSOnState;
+    [self headsetSelected:mCur2chHeadsetFiltering];
+    
 }
 		
 - (void)writeGlobalPrefs
@@ -718,15 +735,16 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     [defaults setValue:mCur16chDevice.title forKey:@"16ch"];
     [defaults setValue:mCur2chBuffer.title forKey:@"2chBuf"];
     [defaults setValue:mCur16chBuffer.title forKey:@"16chBuf"];
+    [defaults setValue:[NSString stringWithFormat:@"%ld", mCur2chHeadsetFiltering.state] forKey:@"headsetFiltering"];
     [defaults synchronize];
 }
 
 - (NSString *)formDevicePrefName:(BOOL)is2ch
 {
 	if (is2ch) {
-        return [mCur2chDevice.title stringByAppendingString:@" [2ch routing]"];
+        return [mCur2chDevice.title stringByAppendingString:@".2chrouting"];
 	} else {
-        return [mCur2chDevice.title stringByAppendingString:@" [16ch routing]"];
+        return [mCur16chDevice.title stringByAppendingString:@".16chrouting"];
 	}
 }
 
