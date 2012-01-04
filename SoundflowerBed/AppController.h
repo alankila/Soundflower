@@ -19,8 +19,6 @@
 	
 	NSMenuItem		*mCur2chDevice;
 	NSMenuItem		*mCur16chDevice;
-	NSMenuItem		*mCur2chBufferSize;
-	NSMenuItem		*mCur16chBufferSize;
 	
 	NSMenuItem		*mSuspended2chDevice;
 	NSMenuItem		*mSuspended16chDevice;

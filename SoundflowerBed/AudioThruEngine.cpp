@@ -148,7 +148,6 @@ void	AudioThruEngine::Start()
 		return;
 	}
 
-	// $$$ should do some checks on the format/sample rate matching
 	if (mInputDevice.mFormat.mSampleRate != mOutputDevice.mFormat.mSampleRate) {
 		if (MatchSampleRate(false)) {
 			printf("Error - sample rate mismatch: %f / %f\n", mInputDevice.mFormat.mSampleRate, mOutputDevice.mFormat.mSampleRate);
@@ -156,15 +155,6 @@ void	AudioThruEngine::Start()
 		}
 	}
 
-
-	/*if (mInputDevice.mFormat.mChannelsPerFrame != mOutputDevice.mFormat.mChannelsPerFrame
-	|| mInputDevice.mFormat.mBytesPerFrame != mOutputDevice.mFormat.mBytesPerFrame) {
-		printf("Error - format mismatch: %ld / %ld channels, %ld / %ld bytes per frame\n",
-			mInputDevice.mFormat.mChannelsPerFrame, mOutputDevice.mFormat.mChannelsPerFrame,
-			mInputDevice.mFormat.mBytesPerFrame, mOutputDevice.mFormat.mBytesPerFrame);
-		return;
-	}*/
-	//mErrorMessage[0] = '\0';
 	mInputBuffer->Allocate(mInputDevice.mFormat.mBytesPerFrame, UInt32(kSecondsInRingBuffer * mInputDevice.mFormat.mSampleRate));
 	mSampleRate = mInputDevice.mFormat.mSampleRate;
 	
@@ -201,18 +191,9 @@ void	AudioThruEngine::Start()
 	verify_noerr (AudioDeviceAddIOProc(mOutputDevice.mID, mOutputIOProc, this));
 	verify_noerr (AudioDeviceStart(mOutputDevice.mID, mOutputIOProc));
 
-//	UInt32 propsize = sizeof(UInt32);
-//	UInt32 isAlreadyRunning;
-//	err =  (AudioDeviceGetProperty(mOutputDevice.mID, 0, false, kAudioDevicePropertyDeviceIsRunning, &propsize, &isAlreadyRunning));
-//	if (isAlreadyRunning)
-//		mOutputProcState = kRunning;
-//	else
-		
-	
 	while (mInputProcState != kRunning || mOutputProcState != kRunning)
 		usleep(1000);
 	
-//	usleep(12000);
 	ComputeThruOffset();
 }
 
@@ -223,21 +204,12 @@ void	AudioThruEngine::ComputeThruOffset()
 		mInToOutSampleOffset = 0;
 		return;
 	}
-//	AudioTimeStamp inputTime, outputTime;
-//	verify_noerr (AudioDeviceGetCurrentTime(mInputDevice.mID, &inputTime));
-//	verify_noerr (AudioDeviceGetCurrentTime(mOutputDevice.mID, &outputTime));
-	
-//	printf(" in host: %20.0f  samples: %20.f  safety: %7ld  buffer: %4ld\n", Float64(inputTime.mHostTime), inputTime.mSampleTime,
-//		mInputDevice.mSafetyOffset, mInputDevice.mBufferSizeFrames);
-//	printf("out host: %20.0f  samples: %20.f  safety: %7ld  buffer: %4ld\n", Float64(outputTime.mHostTime), outputTime.mSampleTime,
-//		mOutputDevice.mSafetyOffset, mOutputDevice.mBufferSizeFrames);
+    
 	mActualThruLatency = SInt32(mInputDevice.mSafetyOffset + /*2 * */ mInputDevice.mBufferSizeFrames +
 						mOutputDevice.mSafetyOffset + mOutputDevice.mBufferSizeFrames) + mExtraLatencyFrames;
 	mInToOutSampleOffset = mActualThruLatency + mIODeltaSampleCount;
-//	printf("thru latency: %.0f frames, inToOutOffset: %0.f frames\n", latency, mInToOutSampleOffset);
 }
 
-// return whether we were running
 bool	AudioThruEngine::Stop()
 {
 	if (!mRunning) return false;
@@ -323,24 +295,11 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 	}
 
 	if (!This->mMuting && This->mThruing) {
-		//double delta = This->mInputBuffer->Fetch((Byte *)outOutputData->mBuffers[0].mData,
-		//						This->mOutputDevice.mBufferSizeFrames,
-		//						UInt64(inOutputTime->mSampleTime - This->mInToOutSampleOffset));
 		double delta = This->mInputBuffer->Fetch(This->mWorkBuf, 
 						This->mInputDevice.mBufferSizeFrames,UInt64(inOutputTime->mSampleTime - This->mInToOutSampleOffset));
-		
-		
-		// not the most efficient, but this should handle devices with multiple streams [i think]
-		// with identitical formats [we know soundflower input channels are always one stream]
+				
 		UInt32 innchnls = This->mInputDevice.mFormat.mChannelsPerFrame;
 		
-		// iSchemy's edit
-		//
-		// this solution will probably be a little bit less efficient
-		// but I wanted to retain the functionality of previous solution
-		// and only add new function
-		// Activity Monitor says it's not bad. 14.8MB and 3% CPU for me
-		// is IMHO insignificant
 		UInt32* chanstart = new UInt32[16];
 			
 		for (UInt32 buf = 0; buf < outOutputData->mNumberBuffers; buf++)
@@ -348,19 +307,17 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 			for (int i = 0; i < 16; i++)
 				chanstart[i] = 0;
 			UInt32 outnchnls = outOutputData->mBuffers[buf].mNumberChannels;
-			for (UInt32 chan = 0; chan < 
-					((This->CloneChannels() && innchnls==2) ? outnchnls : innchnls);
-					chan++)
+			for (UInt32 chan = 0; chan < innchnls; chan ++)
 			{
 				UInt32 outChan = This->GetChannelMap(chan) - chanstart[chan];		
-				if (outChan >= 0 && outChan < outnchnls)
+				if (outChan < outnchnls)
 				{
 					// odd-even
 					float *in = (float *)This->mWorkBuf + (chan % innchnls); 
 					float *out = (float *)outOutputData->mBuffers[buf].mData + outChan;		
-					long framesize = outnchnls * sizeof(float);
+					int frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
 
-					for (UInt32 frame = 0; frame < outOutputData->mBuffers[buf].mDataByteSize; frame += framesize )
+					for (UInt32 frame = 0; frame < frames; frame += 1)
 					{
 						*out += *in;
 						in += innchnls;
@@ -373,12 +330,7 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 		
 		delete [] chanstart;
 		
-		//
-		// end
-					
 		This->mThruTime = delta;
-		
-		//This->ApplyLoad(This->mOutputLoad);
 		
 #if USE_AUDIODEVICEREAD
 		AudioTimeStamp readTime;
@@ -395,9 +347,6 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 	return noErr;
 }
 
-// a hack to get 2 ioprocs on one output device -- although coreaudio allows
-// multiple ioprocs on one device, they have to be different functions
-// [makes sense, since there is no unique id given to each ioproc install] 
 OSStatus AudioThruEngine::OutputIOProc16 (	AudioDeviceID			inDevice,
 											const AudioTimeStamp*	inNow,
 											const AudioBufferList*	inInputData,
@@ -418,17 +367,3 @@ UInt32 AudioThruEngine::GetOutputNchnls()
 	
 	return 0;
 }
-
-#if 0
-void	AudioThruEngine::ApplyLoad(double load)
-{
-	double loadNanos = (load * mBufferSize / mSampleRate) /* seconds */ * 1000000000.;
-	
-	UInt64 now = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
-	UInt64 waitUntil = UInt64(now + loadNanos);
-	
-	while (now < waitUntil) {
-		now = AudioConvertHostTimeToNanos(AudioGetCurrentHostTime());
-	}
-}
-#endif

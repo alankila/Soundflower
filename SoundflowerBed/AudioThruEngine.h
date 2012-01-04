@@ -84,11 +84,6 @@ public:
 
 	Byte			*mWorkBuf;
 	
-	//iSchemy's edit
-	void			SetCloneChannels(bool clone) { mCloneChannels = clone; }
-	bool			CloneChannels() { return mCloneChannels; }
-	
-	
 protected:
 	enum IOProcState {
 		kOff,
@@ -143,11 +138,6 @@ protected:
 	int				mChannelMap[16];
 	AudioDeviceIOProc mOutputIOProc;
 	//char			mErrorMessage[128];
-	
-	// iSchemy's edit
-	bool			mCloneChannels;
-	// end
-
 };
 
 

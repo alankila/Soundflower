@@ -404,45 +404,28 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		m2chMenu = [mMenu addItemWithTitle:@"Soundflower (2ch)" action:@selector(doNothing) keyEquivalent:@""];
 		[m2chMenu setImage:[NSImage imageNamed:@"sf2"]];
 		[m2chMenu setTarget:self];
-			NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"2ch submenu"];
-			NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
-				m2chBuffer = [[NSMenu alloc] initWithTitle:@"2ch Buffer"];
-				item = [m2chBuffer addItemWithTitle:@"64" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m2chBuffer addItemWithTitle:@"128" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m2chBuffer addItemWithTitle:@"256" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m2chBuffer addItemWithTitle:@"512" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				[item setState:NSOnState]; // default
-				mCur2chBufferSize = item;
-				item = [m2chBuffer addItemWithTitle:@"1024" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];
-				item = [m2chBuffer addItemWithTitle:@"2048" action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-				[item setTarget:self];
-			[bufItem setSubmenu:m2chBuffer];
+        
+        NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"2ch submenu"];
+        NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
+        m2chBuffer = [[NSMenu alloc] initWithTitle:@"2ch Buffer"];
+        for (int i = 64; i < 4096; i *= 2) {
+            item = [m2chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
+            [item setTarget:self];
+        }
+		[bufItem setSubmenu:m2chBuffer];
 
-			[submenu addItem:[NSMenuItem separatorItem]];
+		[submenu addItem:[NSMenuItem separatorItem]];
 					
-			item = [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
-			item = [submenu addItemWithTitle:@"Channel 1" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 2" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
+		item = [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
+		item = [submenu addItemWithTitle:@"Channel 1" action:@selector(doNothing) keyEquivalent:@""];
+		[item setTarget:self];	
+		item = [submenu addItemWithTitle:@"Channel 2" action:@selector(doNothing) keyEquivalent:@""];
+		[item setTarget:self];	
 		
-			// iSchemy's edit
-			//
-			[submenu addItem:[NSMenuItem separatorItem]];
-		
-			[[submenu addItemWithTitle:@"Clone to all channels" action:@selector(cloningChanged:) keyEquivalent:@""] setTarget:self];
-			//
-			// end
+		[submenu addItem:[NSMenuItem separatorItem]];
 		
 		[m2chMenu setSubmenu:submenu];
 	
-	
-		
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
 		[item setState:NSOnState];
@@ -454,8 +437,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			AudioDevice ad((*i).mID, false);
 			if (ad.CountChannels()) 
 			{
-                /* FIXME: is this right encoding? Or better, isn't there NSString in there somwhere? */
-				item = [mMenu addItemWithTitle:[NSString stringWithCString:(*i).mName encoding:kCFStringEncodingUTF8] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
+				item = [mMenu addItemWithTitle:[NSString stringWithUTF8String:(*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 				[item setTarget:self];
 				mMenuID2[index++] = (*i).mID;
 			}
@@ -470,68 +452,32 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	
 	
 	if (mSoundflower16Device) {
-	
-		m16chMenu = [mMenu addItemWithTitle:@"Soundflower (16ch)" action:@selector(doNothing) keyEquivalent:@""];
+        m16chMenu = [mMenu addItemWithTitle:@"Soundflower (16ch)" action:@selector(doNothing) keyEquivalent:@""];
 		[m16chMenu setImage:[NSImage imageNamed:@"sf16"]];
 		[m16chMenu setTarget:self];
 		m16StartIndex = [mMenu indexOfItem:m16chMenu];
-			NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"16ch submenu"];
-				NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
-				m16chBuffer = [[NSMenu alloc] initWithTitle:@"16ch Buffer"];
-				item = [m16chBuffer addItemWithTitle:@"64" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m16chBuffer addItemWithTitle:@"128" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m16chBuffer addItemWithTitle:@"256" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				item = [m16chBuffer addItemWithTitle:@"512" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];	
-				[item setState:NSOnState]; // default
-				mCur16chBufferSize = item;
-				item = [m16chBuffer addItemWithTitle:@"1024" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];
-				item = [m16chBuffer addItemWithTitle:@"2048" action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
-				[item setTarget:self];
-			[bufItem setSubmenu:m16chBuffer];
+        NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"16ch submenu"];
+        
+        NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
+        m16chBuffer = [[NSMenu alloc] initWithTitle:@"16ch Buffer"];
+        for (int i = 64; i < 4096; i *= 2) {
+            item = [m16chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
+            [item setTarget:self];	
+            if (i == 512) {
+                [item setState:NSOnState];
+            }
+        }
+        [bufItem setSubmenu:m16chBuffer];
 
-			[submenu addItem:[NSMenuItem separatorItem]];
+        [submenu addItem:[NSMenuItem separatorItem]];
 			
-			item = [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
-			item = [submenu addItemWithTitle:@"Channel 1" action:@selector(doNothing) keyEquivalent:@""];
+        item = [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
+        for (int i = 1; i <= 16; i ++) {
+			item = [submenu addItemWithTitle:[NSString stringWithFormat:@"Channel %d", i] action:@selector(doNothing) keyEquivalent:@""];
 			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 2" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 3" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 4" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 5" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 6" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 7" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 8" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];
-			item = [submenu addItemWithTitle:@"Channel 9" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 10" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 11" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 12" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];
-			item = [submenu addItemWithTitle:@"Channel 13" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 14" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 15" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
-			item = [submenu addItemWithTitle:@"Channel 16" action:@selector(doNothing) keyEquivalent:@""];
-			[item setTarget:self];	
+        }
 		[m16chMenu setSubmenu:submenu];
-	
-	
+		
 		item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 		[item setTarget:self];
 		[item setState:NSOnState];
@@ -543,8 +489,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			AudioDevice ad((*i).mID, false);
 			if (ad.CountChannels()) 
 			{
-                /* FIXME: right encoding? */
-				item = [mMenu addItemWithTitle:[NSString stringWithCString:(*i).mName encoding:kCFStringEncodingUTF8] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
+				item = [mMenu addItemWithTitle:[NSString stringWithUTF8String:(*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
 				[item setTarget:self];	
 				mMenuID16[index++] = (*i).mID;
 			}
@@ -656,45 +601,23 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 - (IBAction)bufferSizeChanged2ch:(id)sender
 {
-	UInt32 val = [m2chBuffer indexOfItem:sender];
-	UInt32 size = 64 << val;
+    for (NSMenuItem *item in m2chBuffer.itemArray) {
+        [item setState:NSOffState];
+    }
+	UInt32 size = [[sender title] intValue];
 	gThruEngine2->SetBufferSize(size);
-
-	[mCur2chBufferSize setState:NSOffState];
 	[sender setState:NSOnState];
-	mCur2chBufferSize = sender;
 }
 
 - (IBAction)bufferSizeChanged16ch:(id)sender
 {
-	UInt32 val = [m2chBuffer indexOfItem:sender];
-	UInt32 size = 64 << val;
-	gThruEngine16->SetBufferSize(size);
-
-	[mCur16chBufferSize setState:NSOffState];
+	for (NSMenuItem *item in m16chBuffer.itemArray) {
+        [item setState:NSOffState];
+    }
+	UInt32 size = [[sender title] intValue];
+    gThruEngine16->SetBufferSize(size);
 	[sender setState:NSOnState];
-	mCur16chBufferSize = sender;
 }
-
-// iSchemy's edit
-//
-// action for item was clicked
-- (IBAction)cloningChanged:(id)sender 
-{
-	// change item's state
-	[sender setState:([sender state]==NSOnState) ? NSOffState : NSOnState];
-	gThruEngine2->SetCloneChannels([sender state]==NSOnState);
-	[self writeDevicePrefs:YES];
-}
-
-// preferences read
-- (IBAction)cloningChanged:(id)sender cloneChannels:(bool)clone
-{
-	gThruEngine2->SetCloneChannels(clone);
-	[sender setState:(clone ? NSOnState : NSOffState)];
-}
-//
-// end
 
 - (IBAction)routingChanged2ch:(id)outDevChanItem
 {
@@ -742,13 +665,7 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	int val = [mMenu indexOfItem:sender];
 	if (val < m16StartIndex) {
 		val -= 2;
-		
-		// if 'None' was selected, our val will be == -1, which will return a NULL
-		// device from the list, which is what we want anyway, and seems to work
-		// here -- probably should check to see if there are any potential problems
-		// and handle this more properly
 		gThruEngine2->SetOutputDevice( (val < 0 ? kAudioDeviceUnknown : mMenuID2[val]) );
-		//[self updateThruLatency];	
 		
 		[mCur2chDevice setState:NSOffState];
 		[sender setState:NSOnState];
@@ -782,118 +699,60 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	}
 }
 
-
-
 - (void)doNothing
 {
-
 }
 
 - (void)readGlobalPrefs
 {
-	CFStringRef strng  = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("2ch Output Device"), kCFPreferencesCurrentApplication);
-	if (strng) {
-		char name[64];
-		CFStringGetCString(strng, name, 64, kCFStringEncodingUTF8);
-		NSMenuItem *item = [mMenu itemWithTitle:[NSString stringWithCString:name encoding:kCFStringEncodingUTF8]];
+    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+    NSString *v;
+    
+    v = [defaults valueForKey:@"2ch"];
+    if (v) {
+		NSMenuItem *item = [mMenu itemWithTitle:v];
 		if (item)
 			[self outputDeviceSelected:item];
 	}
-	
-	strng  = (CFStringRef) CFPreferencesCopyAppValue(CFSTR("16ch Output Device"), kCFPreferencesCurrentApplication);
-	if (strng) {
-		char name[64];
-		CFStringGetCString(strng, name, 64, kCFStringEncodingUTF8);
-		
-		// itemWithTitle only returns the first instance, and we need to find the second one, so
-		// make calculations based on index #
-		int index = [mMenu indexOfItemWithTitle:[NSString stringWithCString:name encoding:kCFStringEncodingUTF8]];
-		if (index >= 0)
-			[self outputDeviceSelected:[mMenu itemAtIndex:(m16StartIndex+index)]];
+
+	v = [defaults valueForKey:@"16ch"];
+    if (v) {
+		NSMenuItem *item = [mMenu itemWithTitle:v];
+		if (item)
+			[self outputDeviceSelected:item];
+	}
+
+	v = [defaults valueForKey:@"2chBuf"];
+	if (v) {
+        NSInteger val = [v intValue];
+		for (NSInteger i = 64, j = 0; i < 4096; i *= 2, j += 1) {
+            if (i == val) {
+				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:j]];
+            }
+        }
 	}
 	
-	CFNumberRef num = (CFNumberRef) CFPreferencesCopyAppValue(CFSTR("2ch Buffer Size"), kCFPreferencesCurrentApplication);
-	if (num) {
-		UInt32 val;
-		CFNumberGetValue(num, kCFNumberLongType, &val);	
-		CFRelease(num);
-		
-		switch (val) {
-			case 64:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:0]];
-				break;
-			case 128:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:1]];
-				break;
-			case 256:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:2]];
-				break;
-			case 1024:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:4]];
-				break;
-			case 2048:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:5]];
-				break;
-				
-			case 512:
-			default:
-				[self bufferSizeChanged2ch:[m2chBuffer itemAtIndex:3]];
-				break;
-		}
-	}
-	
-	num = (CFNumberRef) CFPreferencesCopyAppValue(CFSTR("16ch Buffer Size"), kCFPreferencesCurrentApplication);
-	if (num) {
-		UInt32 val;
-		CFNumberGetValue(num, kCFNumberLongType, &val);	
-		CFRelease(num);
-		
-		switch (val) {
-			case 64:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:0]];
-				break;
-			case 128:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:1]];
-				break;
-			case 256:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:2]];
-				break;
-			case 1024:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:4]];
-				break;
-			case 2048:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:5]];
-				break;
-				
-			case 512:
-			default:
-				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:3]];
-				break;
-		}
+	v = [defaults valueForKey:@"16chBuf"];
+	if (v) {
+        NSInteger val = [v intValue];
+		for (NSInteger i = 64, j = 0; i < 4096; i *= 2, j += 1) {
+            if (i == val) {
+				[self bufferSizeChanged16ch:[m16chBuffer itemAtIndex:j]];
+            }
+        }
 	}
 }
 		
 - (void)writeGlobalPrefs
 {
-	CFStringRef cfstr = CFStringCreateWithCString(kCFAllocatorSystemDefault, [[mCur2chDevice title] cStringUsingEncoding:kCFStringEncodingUTF8], kCFStringEncodingUTF8);
-	CFPreferencesSetAppValue(CFSTR("2ch Output Device"), cfstr, kCFPreferencesCurrentApplication);
-	CFRelease(cfstr); 
-	
-	cfstr = CFStringCreateWithCString(kCFAllocatorSystemDefault, [[mCur16chDevice title] cStringUsingEncoding:kCFStringEncodingUTF8], kCFStringEncodingUTF8);
-	CFPreferencesSetAppValue(CFSTR("16ch Output Device"), cfstr, kCFPreferencesCurrentApplication);
-	CFRelease(cfstr);
-
-	UInt32 val = 64 << [m2chBuffer indexOfItem:mCur2chBufferSize];
-	CFNumberRef number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberIntType, &val);
-	CFPreferencesSetAppValue(CFSTR("2ch Buffer Size"), number, kCFPreferencesCurrentApplication);
-	CFRelease(number);
-	
-	val = 64 << [m16chBuffer indexOfItem:mCur16chBufferSize];
-	number = CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberIntType, &val);
-	CFPreferencesSetAppValue(CFSTR("16ch Buffer Size"), number, kCFPreferencesCurrentApplication);
-	CFRelease(number);		
-
-	CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+    NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
+    [defaults setValue:[mCur2chDevice title] forKey:@"2ch"];
+    [defaults setValue:[mCur16chDevice title] forKey:@"16ch"];
+	NSInteger val = 64 << [m2chBuffer indexOfItem:m2chBuffer.highlightedItem];
+    [defaults setValue:[NSString stringWithFormat:@"%d", val] forKey:@"2chBuf"];
+	val = 64 << [m16chBuffer indexOfItem:m16chBuffer.highlightedItem];
+    [defaults setValue:[NSString stringWithFormat:@"%d", val] forKey:@"16chBuf"];
+    [defaults synchronize];
 }
 
 - (CFStringRef)formDevicePrefName:(BOOL)is2ch
@@ -901,11 +760,11 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	if (is2ch) {
 		NSString *routingTag = @" [2ch Routing]";
 		NSString *deviceName  = [mCur2chDevice title];
-		return CFStringCreateWithCString(kCFAllocatorSystemDefault, [[deviceName stringByAppendingString:routingTag] cStringUsingEncoding:kCFStringEncodingUTF8], kCFStringEncodingUTF8);
+		return CFStringCreateWithCString(kCFAllocatorSystemDefault, [[deviceName stringByAppendingString:routingTag] cStringUsingEncoding:NSUTF8StringEncoding], kCFStringEncodingUTF8);
 	} else {
 		NSString *routingTag = @" [16ch Routing]";
 		NSString *deviceName  = [mCur16chDevice title];
-		return CFStringCreateWithCString(kCFAllocatorSystemDefault, [[deviceName stringByAppendingString:routingTag] cStringUsingEncoding:kCFStringEncodingUTF8], kCFStringEncodingUTF8);
+		return CFStringCreateWithCString(kCFAllocatorSystemDefault, [[deviceName stringByAppendingString:routingTag] cStringUsingEncoding:NSUTF8StringEncoding], kCFStringEncodingUTF8);
 	}
 }
 
@@ -932,28 +791,6 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 		for (int i = 0; i < numChans; i++) 
 			thruEng->SetChannelMap(i, i);
 	}
-	
-	//CFRelease(arrayName);
-	
-	// iSchemy's edit
-	//
-	// cloning is enabled only for 2ch mode
-	// sorta makes sense, huh?
-	if (is2ch) {
-		CFBooleanRef clone = (CFBooleanRef)CFPreferencesCopyAppValue(CFSTR("Clone channels"), kCFPreferencesCurrentApplication);
-		// if cloning is enabled in preferences, it will affect also the menu item's state
-		NSMenuItem* item = [[m2chMenu submenu] itemWithTitle:@"Clone to all channels"];
-			if (clone && item) {
-				[self cloningChanged:item cloneChannels:CFBooleanGetValue(clone)];
-				CFRelease(clone);
-			}
-			// but if it is disabled, no state changing is needed
-			else {
-				thruEng->SetCloneChannels(false);
-			}
-	}
-	//
-	// end
 }
 
 - (void)writeDevicePrefs:(BOOL)is2ch
@@ -972,27 +809,6 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 	CFArrayRef mapArray = CFArrayCreate(kCFAllocatorSystemDefault, (const void**)&map, numChans, NULL);
 	CFPreferencesSetAppValue(arrayName, mapArray, kCFPreferencesCurrentApplication);
-	//CFRelease(mapArray);
-	
-	//for (int i = 0; i < numChans; i++)
-	//	CFRelease(map[i]);
-	
-	//CFRelease(arrayName);
-	
-	// iSchemy's edit
-	//
-	// I think that this needs no commentary
-	if(is2ch){
-		char cloneValue = thruEng->CloneChannels();
-		CFNumberRef clone = (CFNumberRef)CFNumberCreate(kCFAllocatorSystemDefault, kCFNumberCharType, &cloneValue);
-		CFPreferencesSetAppValue(CFSTR("Clone channels"),
-								 clone,
-								 kCFPreferencesCurrentApplication);
-		CFRelease(clone);
-	}
-	//
-	// end
-	
 	CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
@@ -1003,9 +819,9 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 -(void)doAbout
 {
-	// orderFrontStandardAboutPanel doesnt work for background apps
 	[mAboutController doAbout];
 }
+
 - (void)doQuit
 {
 	[NSApp terminate:nil];
