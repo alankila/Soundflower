@@ -2,13 +2,13 @@
 */
 
 #import "AppController.h"
+#import "AudioDevice.h"
 
 #include "AudioThruEngine.h"
 
 @implementation AppController
 
 AudioThruEngine	*gThruEngine2 = NULL;
-Boolean startOnAwake = false;
 
 OSStatus	HardwareListenerProc (	AudioHardwarePropertyID	inPropertyID,
                                     void*					inClientData)
@@ -155,80 +155,108 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	[pool release];
 }
 
+- (NSArray *)listAudioDevices {
+    AudioObjectPropertyAddress devicesAddress = {
+        kAudioHardwarePropertyDevices,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    }; 
+
+    UInt32 deviceArraySize = 0;
+    verify_noerr(AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &devicesAddress, 0, NULL, &deviceArraySize));
+    NSLog(@"AudioObjects to scan: %d (bytes)", deviceArraySize);
+    
+    AudioDeviceID *devices = new AudioDeviceID[deviceArraySize / sizeof(AudioDeviceID)];
+    verify_noerr(AudioObjectGetPropertyData(kAudioObjectSystemObject,
+                                            &devicesAddress, 
+                                            0,
+                                            NULL,
+                                            &deviceArraySize, 
+                                            devices));
+
+    NSMutableArray *devs = [[[NSMutableArray alloc] init] autorelease];
+    for (int i = 0; i < deviceArraySize / sizeof(AudioObjectID); i ++) {
+        AudioObjectID aoID = devices[i];
+
+        AudioObjectPropertyAddress inputAddress = {
+            kAudioDevicePropertyStreamConfiguration,
+            kAudioDevicePropertyScopeInput,
+            kAudioObjectPropertyElementMaster
+        }; 
+
+        UInt32 dataSize;
+        verify_noerr(AudioObjectGetPropertyDataSize(aoID, &inputAddress, 0, NULL, &dataSize));
+        NSLog(@"Found device: %d with input descriptor size %d", aoID, dataSize);
+        AudioDevice *dev = new AudioDevice(aoID, dataSize == 0);
+        [devs addObject:[NSValue valueWithPointer:dev]];
+    }
+    delete[] devices;
+    return devs;
+}
+
 - (IBAction)refreshDevices
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
 	[self buildDeviceList];		
 	
 	[mSbItem setMenu:nil];
 	[mMenu dealloc];
 	
 	[self buildMenu];
-
-	/* If our device is removed, we selected the first one in the list to replace it. */
-	AudioDeviceID dev = gThruEngine2->GetOutputDevice();
-	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
-	AudioDeviceList::DeviceList::iterator i;
-	for (i = thelist.begin(); i != thelist.end(); ++i) {
-		if ((*i).mID == dev) {
-			break;
+    
+    BOOL found = NO;
+	AudioObjectID outputDev = gThruEngine2->GetOutputDevice();
+    for (NSValue *wrap in mOutputDeviceList) {
+        AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
+        if (dev->mID == outputDev) {
+            found = YES;
         }
     }
-	if (i == thelist.end()) {
-		[self outputDeviceSelected:[m2chOutputDevice itemAtIndex:0]];
-    }
-		
-	[pool release];
 }
 
 - (void)InstallListeners;
 {	
-	// add listeners for all devices, including soundflowers
-	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
-	int index = 0;
-	for (AudioDeviceList::DeviceList::iterator i = thelist.begin(); i != thelist.end(); ++i, ++index) {
-		if (0 == strncmp("Soundflower", (*i).mName, strlen("Soundflower"))) {
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));			
-		}
-		else {
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener((*i).mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc, self));
-
+    for (NSValue *wrap in mOutputDeviceList) {
+        AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
+        NSString *name = (NSString *) dev->GetName();
+        
+		if ([name isEqualTo:@"Soundflower (2ch)"] || [name isEqualTo:@"Soundflower (16ch)"]) {
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));			
+		} else {
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc, self));
+			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc, self));
 		}
 	}
 		
 	// check for added/removed devices
-   verify_noerr (AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc, self));   
+    verify_noerr (AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc, self));   
 }
 
 - (void)RemoveListeners
 {
-	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
-	int index = 0;
-	for (AudioDeviceList::DeviceList::iterator i = thelist.begin(); i != thelist.end(); ++i, ++index) {
-		if (0 == strncmp("Soundflower", (*i).mName, strlen("Soundflower"))) {
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
+    for (NSValue *wrap in mOutputDeviceList) {
+        AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
+        NSString *name = (NSString *) dev->GetName();
+
+		if ([name isEqualTo:@"Soundflower (2ch)"] || [name isEqualTo:@"Soundflower (16ch)"]) {
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
 		}
 		else {
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener((*i).mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc));
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc));
+			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc));
 		}
 	}
 
-	 verify_noerr (AudioHardwareRemovePropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc));
+    verify_noerr (AudioHardwareRemovePropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc));
 }
 
 - (id)init
 {
-	mOutputDeviceList = NULL;
-	
 	mSoundflower2Device = 0;
 	mSuspended2chDevice = Nil;
 	
@@ -237,9 +265,17 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 - (void)dealloc
 {
-	[self RemoveListeners];
-	delete mOutputDeviceList;
+	if (mOutputDeviceList) {
+		[self RemoveListeners];
+        for (NSValue *value in mOutputDeviceList) {
+            AudioDevice *dev = (AudioDevice *) value.pointerValue;
+            delete dev;
+        }
+        [mOutputDeviceList release];
+        mOutputDeviceList = Nil;
+	}
     delete gThruEngine2;
+    gThruEngine2 = NULL;
 	[super dealloc];
 }
 
@@ -250,15 +286,20 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	mMenu = [[NSMenu alloc] init];
         
     m2chOutputDevice = [[NSMenu alloc] init];
-    
-    AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
-    for (AudioDeviceList::DeviceList::iterator i = thelist.begin(); i != thelist.end(); ++i) {
-        AudioDevice ad((*i).mID, false);
-        if (ad.CountChannels()) {
-            item = [m2chOutputDevice addItemWithTitle:[NSString stringWithUTF8String:(*i).mName] action:@selector(outputDeviceSelected:) keyEquivalent:@""];
-            item.target = self;
-            item.tag = (*i).mID;
+
+    for (NSValue *value in mOutputDeviceList) {
+        AudioDevice *dev = (AudioDevice *) value.pointerValue;
+        NSString *name = (NSString *) dev->GetName();
+		if ([name isEqualTo:@"Soundflower (2ch)"] || [name isEqualTo:@"Soundflower (16ch)"]) {
+            continue;
         }
+        if (dev->CountChannels()) {
+            NSString *name = (NSString *) dev->GetName();
+            item = [m2chOutputDevice addItemWithTitle:name action:@selector(outputDeviceSelected:) keyEquivalent:@""];
+            item.target = self;
+            item.tag = dev->mID;
+        }
+        delete dev;
     }
 	
     item = [mMenu addItemWithTitle:@"Output device" action:Nil keyEquivalent:@""];
@@ -317,29 +358,46 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 {
 	if (mOutputDeviceList) {
 		[self RemoveListeners];
-		delete mOutputDeviceList;
-	}
-	
-	mOutputDeviceList = new AudioDeviceList(false);
-	[self InstallListeners];
-	
-	// find soundflower devices, store and remove them from our output list
-	AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
-	int index = 0;
-	for (AudioDeviceList::DeviceList::iterator i = thelist.begin(); i != thelist.end(); ++i, ++index) {
-		if (0 == strcmp("Soundflower (2ch)", (*i).mName)) {
-			mSoundflower2Device = (*i).mID;
-			AudioDeviceList::DeviceList::iterator toerase = i;
-			i --;
-			thelist.erase(toerase);
-		}
-        /* I have no use for the 16ch device, so I just hide it if someone sees it. */
-		if (0 == strcmp("Soundflower (16ch)", (*i).mName)) {
-			AudioDeviceList::DeviceList::iterator toerase = i;
-			i --;
-			thelist.erase(toerase);
+        for (NSValue *value in mOutputDeviceList) {
+            AudioDevice *dev = (AudioDevice *) value.pointerValue;
+            delete dev;
         }
+        [mOutputDeviceList release];
+        mOutputDeviceList = Nil;
 	}
+	
+	mOutputDeviceList = [self listAudioDevices];
+	[self InstallListeners];
+    
+    mSoundflower2Device = 0;
+    for (NSValue *wrap in mOutputDeviceList) {
+        AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
+        NSString *name = (NSString *) dev->GetName();
+        
+        if ([name isEqualTo:@"Soundflower (2ch)"]) {
+            mSoundflower2Device = dev->mID;
+            break;
+        }        
+    }
+    
+    if (! mSoundflower2Device) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        alert.messageText = @"Soundflower audio device can not be found. Is the kernel driver running? (Tried to find device with name 'Soundflower (2ch)'";
+        [alert runModal];
+    }
+}
+
+- (NSImage *)invert:(NSImage *)image {
+    return image;
+/* Will fix this to work later... Once I undertand where CIFilter is... :-/
+    CIImage* ciImage = [[CIImage alloc] initWithData:[image TIFFRepresentation]];
+    CIFilter* filter = [CIFilter filterWithName:@"CIColorInvert"];
+    [filter setDefaults];
+    [filter setValue:ciImage forKey:@"inputImage"];
+    CIImage* output = [filter valueForKey:@"outputImage"];
+    [output drawAtPoint:NSZeroPoint fromRect:NSRectFromCGRect([output extent]) operation:NSCompositeSourceOver fraction:1.0];
+    return [[NSImage alloc] initWithCGImage:output size:NSSizeFromCGSize(output.extent.size)];
+*/
 }
 
 - (void)awakeFromNib
@@ -351,8 +409,9 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	mSbItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
 	[mSbItem retain];
 	
-	[mSbItem setImage:[NSImage imageNamed:@"menuIcon"]];
-	[mSbItem setHighlightMode:YES];
+	mSbItem.image = [NSImage imageNamed:@"menuIcon"];
+    mSbItem.alternateImage = [self invert:mSbItem.image];
+    mSbItem.highlightMode = YES;
 	[self buildMenu];
 	
 	if (mSoundflower2Device) {

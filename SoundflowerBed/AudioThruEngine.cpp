@@ -72,7 +72,7 @@ AudioThruEngine::~AudioThruEngine()
 	delete mInputBuffer;
 }
 
-void	AudioThruEngine::SetDevices(AudioDeviceID input, AudioDeviceID output)
+void	AudioThruEngine::SetDevices(AudioObjectID input, AudioObjectID output)
 {
 	Stop();
 	
@@ -83,7 +83,7 @@ void	AudioThruEngine::SetDevices(AudioDeviceID input, AudioDeviceID output)
 }
 
 
-void	AudioThruEngine::SetInputDevice(AudioDeviceID input)
+void	AudioThruEngine::SetInputDevice(AudioObjectID input)
 {
 	Stop();
 	mInputDevice.Init(input, true);
@@ -92,7 +92,7 @@ void	AudioThruEngine::SetInputDevice(AudioDeviceID input)
 	Start();
 }
 
-void	AudioThruEngine::SetOutputDevice(AudioDeviceID output)
+void	AudioThruEngine::SetOutputDevice(AudioObjectID output)
 {
 	Stop();
 	mOutputDevice.Init(output, false);
@@ -257,7 +257,7 @@ bool	AudioThruEngine::Stop()
 
 // Input IO Proc
 // Receiving input for 1 buffer + safety offset into the past
-OSStatus AudioThruEngine::InputIOProc (	AudioDeviceID			inDevice,
+OSStatus AudioThruEngine::InputIOProc (	AudioObjectID			inDevice,
 										const AudioTimeStamp*	inNow,
 										const AudioBufferList*	inInputData,
 										const AudioTimeStamp*	inInputTime,
@@ -290,7 +290,7 @@ OSStatus AudioThruEngine::InputIOProc (	AudioDeviceID			inDevice,
 
 // Output IO Proc
 // Rendering output for 1 buffer + safety offset into the future
-OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
+OSStatus AudioThruEngine::OutputIOProc (	AudioObjectID			inDevice,
 											const AudioTimeStamp*	inNow,
 											const AudioBufferList*	inInputData,
 											const AudioTimeStamp*	inInputTime,
@@ -368,7 +368,7 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 	return noErr;
 }
 
-OSStatus AudioThruEngine::OutputIOProc16 (	AudioDeviceID			inDevice,
+OSStatus AudioThruEngine::OutputIOProc16 (	AudioObjectID			inDevice,
 											const AudioTimeStamp*	inNow,
 											const AudioBufferList*	inInputData,
 											const AudioTimeStamp*	inInputTime,

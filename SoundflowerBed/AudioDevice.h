@@ -49,9 +49,9 @@
 class AudioDevice {
 public:
 	AudioDevice() : mID(kAudioDeviceUnknown) { }
-	AudioDevice(AudioDeviceID devid, bool isInput) { Init(devid, isInput); }
+	AudioDevice(AudioObjectID devid, bool isInput) { Init(devid, isInput); }
 
-	void	Init(AudioDeviceID devid, bool isInput);
+	void	Init(AudioObjectID devid, bool isInput);
 	
 	bool	Valid() { return mID != kAudioDeviceUnknown; }
 	
@@ -61,10 +61,10 @@ public:
 	void	UpdateFormat();
 	
 	int		CountChannels();
-	char *	GetName(char *buf, UInt32 maxlen);
+	CFStringRef GetName();
 
 public:
-	AudioDeviceID					mID;
+	AudioObjectID					mID;
 	bool							mIsInput;
 	UInt32							mSafetyOffset;
 	UInt32							mBufferSizeFrames;

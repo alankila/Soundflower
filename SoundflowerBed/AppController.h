@@ -1,9 +1,9 @@
 /* AppController */
 
 #import <Cocoa/Cocoa.h>
-#import "HelpWindowController.h"
-#include "AudioDeviceList.h"
+#import <CoreAudio/CoreAudio.h>
 
+#import "HelpWindowController.h"
 
 @interface AppController : NSObject<NSApplicationDelegate>
 {
@@ -32,9 +32,8 @@
 	/* Temporary stash for the value of the current 2ch output device while system is suspended. */
 	NSMenuItem		*mSuspended2chDevice;
 	
-	AudioDeviceID	mSoundflower2Device;
-	
-	AudioDeviceList *mOutputDeviceList;	
+	AudioObjectID	mSoundflower2Device;
+    NSArray        *mOutputDeviceList;
 	
 	IBOutlet HelpWindowController *mAboutController;
 }

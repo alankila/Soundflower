@@ -42,7 +42,7 @@
 
 #include "AudioDevice.h"
 
-void	AudioDevice::Init(AudioDeviceID devid, bool isInput)
+void	AudioDevice::Init(AudioObjectID devid, bool isInput)
 {
 	mID = devid;
 	mIsInput = isInput;
@@ -107,8 +107,10 @@ int		AudioDevice::CountChannels()
 	return result;
 }
 
-char *	AudioDevice::GetName(char *buf, UInt32 maxlen)
+CFStringRef	AudioDevice::GetName()
 {
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyDeviceName, &maxlen, buf));
+    CFStringRef buf;
+    UInt32 maxlen = sizeof(buf);
+	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyDeviceNameCFString, &maxlen, &buf));
 	return buf;
 }

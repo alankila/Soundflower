@@ -54,9 +54,9 @@ public:
 	AudioThruEngine();
 	~AudioThruEngine();
 	
-	void	SetDevices(AudioDeviceID input, AudioDeviceID output);
-	void	SetInputDevice(AudioDeviceID input);
-	void	SetOutputDevice(AudioDeviceID output);
+	void	SetDevices(AudioObjectID input, AudioObjectID output);
+	void	SetInputDevice(AudioObjectID input);
+	void	SetOutputDevice(AudioObjectID output);
 	
 	void	Start();
 	bool	Stop();
@@ -73,8 +73,8 @@ public:
 	SInt32	GetThruLatency() { return mActualThruLatency; }
 	
 	UInt32	GetOutputNchnls();
-	AudioDeviceID	GetOutputDevice() { return mOutputDevice.mID; }
-	AudioDeviceID	GetInputDevice() { return mInputDevice.mID; }
+	AudioObjectID	GetOutputDevice() { return mOutputDevice.mID; }
+	AudioObjectID	GetInputDevice() { return mInputDevice.mID; }
 	
 	OSStatus	MatchSampleRate(bool useInputDevice);
 	
@@ -89,7 +89,7 @@ protected:
 		kStopRequested
 	};
     
-	static OSStatus InputIOProc (	AudioDeviceID			inDevice,
+	static OSStatus InputIOProc (	AudioObjectID			inDevice,
 									const AudioTimeStamp*	inNow,
 									const AudioBufferList*	inInputData,
 									const AudioTimeStamp*	inInputTime,
@@ -97,7 +97,7 @@ protected:
 									const AudioTimeStamp*	inOutputTime,
 									void*					inClientData);
 
-	static OSStatus OutputIOProc (	AudioDeviceID			inDevice,
+	static OSStatus OutputIOProc (	AudioObjectID			inDevice,
 									const AudioTimeStamp*	inNow,
 									const AudioBufferList*	inInputData,
 									const AudioTimeStamp*	inInputTime,
@@ -105,7 +105,7 @@ protected:
 									const AudioTimeStamp*	inOutputTime,
 									void*					inClientData);
 
-	static OSStatus OutputIOProc16 (	AudioDeviceID			inDevice,
+	static OSStatus OutputIOProc16 (	AudioObjectID			inDevice,
 									const AudioTimeStamp*	inNow,
 									const AudioBufferList*	inInputData,
 									const AudioTimeStamp*	inInputTime,
