@@ -48,40 +48,64 @@ void	AudioDevice::Init(AudioObjectID devid, bool isInput)
 	mIsInput = isInput;
 	if (mID == kAudioDeviceUnknown) return;
 	
-	UInt32 propsize;
+    AudioObjectPropertyAddress propertyAddress = {
+        0,
+        mIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+    UInt32 propsize;
+    
+    propsize = sizeof(mSafetyOffset);
+    propertyAddress.mSelector = kAudioDevicePropertySafetyOffset;
+    verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mSafetyOffset));
+    
+    propsize = sizeof(mBufferSizeFrames);
+    propertyAddress.mSelector = kAudioDevicePropertyBufferFrameSize;
+    verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mBufferSizeFrames));
 	
-	propsize = sizeof(UInt32);
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertySafetyOffset, &propsize, &mSafetyOffset));
-	
-	propsize = sizeof(UInt32);
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyBufferFrameSize, &propsize, &mBufferSizeFrames));
-	
+    fprintf(stderr, "Constructed buffer with %d frames and safety offset %d\n", mBufferSizeFrames, mSafetyOffset);
+    
 	UpdateFormat();
 }
 
 void	AudioDevice::UpdateFormat()
 {
-	UInt32 propsize = sizeof(AudioStreamBasicDescription);
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyStreamFormat, &propsize, &mFormat));
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyStreamFormat,
+        mIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+	UInt32 propsize = sizeof(mFormat);
+    verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mFormat));
+    fprintf(stderr, "Determined sampling rate: %lf\n", mFormat.mSampleRate);
 }
 
 void	AudioDevice::SetBufferSize(UInt32 size)
 {
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyBufferFrameSize,
+        mIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
 	UInt32 propsize = sizeof(UInt32);
-	verify_noerr(AudioDeviceSetProperty(mID, NULL, 0, mIsInput, kAudioDevicePropertyBufferFrameSize, propsize, &size));
+    verify_noerr(AudioObjectSetPropertyData(mID, &propertyAddress, 0, NULL, propsize, &size));
 
-	propsize = sizeof(UInt32);
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyBufferFrameSize, &propsize, &mBufferSizeFrames));
+	propsize = sizeof(mBufferSizeFrames);
+	verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mBufferSizeFrames));
 }
 
 OSStatus	AudioDevice::SetSampleRate(Float64 sr)
 {
-	UInt32 propsize = sizeof(AudioStreamBasicDescription);
-	mFormat.mSampleRate = sr;
-	OSStatus err = AudioDeviceSetProperty(mID, NULL, 0, mIsInput, kAudioDevicePropertyStreamFormat, propsize, &mFormat);
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyStreamFormat,
+        mIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+	UInt32 propsize = sizeof(mFormat);
 
-	// now re-read to see what actual value is
-	UpdateFormat();
+	mFormat.mSampleRate = sr;
+    OSStatus err = AudioObjectSetPropertyData(mID, &propertyAddress, 0, NULL, propsize, &mFormat);
+    UpdateFormat();
 	
 	return err;
 }
@@ -89,28 +113,42 @@ OSStatus	AudioDevice::SetSampleRate(Float64 sr)
 
 int		AudioDevice::CountChannels()
 {
-	OSStatus err;
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyStreamConfiguration,
+        mIsInput ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput,
+        kAudioObjectPropertyElementMaster
+    };
+
 	UInt32 propSize;
-	int result = 0;
 
-	err = AudioDeviceGetPropertyInfo(mID, 0, mIsInput, kAudioDevicePropertyStreamConfiguration, &propSize, NULL);
-	if (err) return 0;
+	OSStatus err = AudioObjectGetPropertyDataSize(mID, &propertyAddress, 0, NULL, &propSize);
+	if (err) {
+        return 0;
+    }
 
-	AudioBufferList *buflist = (AudioBufferList *)malloc(propSize);
-	err = AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyStreamConfiguration, &propSize, buflist);
-	if (!err) {
-		for (UInt32 i = 0; i < buflist->mNumberBuffers; ++i) {
+    int result = 0;
+	
+    AudioBufferList *buflist = (AudioBufferList *) malloc(propSize);
+	err = AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propSize, buflist);
+	if (! err) {
+		for (UInt32 i = 0; i < buflist->mNumberBuffers; i ++) {
 			result += buflist->mBuffers[i].mNumberChannels;
 		}
 	}
 	free(buflist);
+    
 	return result;
 }
 
 CFStringRef	AudioDevice::GetName()
 {
+    AudioObjectPropertyAddress propertyAddress = {
+        kAudioDevicePropertyDeviceNameCFString,
+        kAudioObjectPropertyScopeGlobal,
+        kAudioObjectPropertyElementMaster
+    };
     CFStringRef buf;
     UInt32 maxlen = sizeof(buf);
-	verify_noerr(AudioDeviceGetProperty(mID, 0, mIsInput, kAudioDevicePropertyDeviceNameCFString, &maxlen, &buf));
-	return buf;
+	verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &maxlen, &buf));
+    return buf;
 }
