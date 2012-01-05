@@ -200,17 +200,11 @@ void	AudioThruEngine::Start()
 	mInputProcState = kStarting;
 	mOutputProcState = kStarting;
 	
-	verify_noerr (AudioDeviceAddIOProc(mInputDevice.mID, InputIOProc, this));
-	verify_noerr (AudioDeviceStart(mInputDevice.mID, InputIOProc));
+	verify_noerr(AudioDeviceCreateIOProcID(mInputDevice.mID, InputIOProc, this, &mInputProcID));
+	verify_noerr(AudioDeviceStart(mInputDevice.mID, InputIOProc));
 	
-	if (mInputDevice.CountChannels() == 16)
-		mOutputIOProc = OutputIOProc16;
-	else
-		mOutputIOProc = OutputIOProc;
-		
-
-	verify_noerr (AudioDeviceAddIOProc(mOutputDevice.mID, mOutputIOProc, this));
-	verify_noerr (AudioDeviceStart(mOutputDevice.mID, mOutputIOProc));
+	verify_noerr(AudioDeviceCreateIOProcID(mOutputDevice.mID, OutputIOProc, this, &mOutputProcID));
+	verify_noerr(AudioDeviceStart(mOutputDevice.mID, OutputIOProc));
 
 	while (mInputProcState != kRunning || mOutputProcState != kRunning)
 		usleep(1000);
@@ -242,8 +236,8 @@ bool	AudioThruEngine::Stop()
 	while (mInputProcState != kOff || mOutputProcState != kOff)
 		usleep(5000);
 
-	AudioDeviceRemoveIOProc(mInputDevice.mID, InputIOProc);
-	AudioDeviceRemoveIOProc(mOutputDevice.mID, mOutputIOProc);
+	AudioDeviceDestroyIOProcID(mInputDevice.mID, mInputProcID);
+    AudioDeviceDestroyIOProcID(mOutputDevice.mID, mOutputProcID);
 	
 	if (mWorkBuf) {
 		delete[] mWorkBuf;
@@ -308,7 +302,7 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioObjectID			inDevice,
 		}
 		return noErr;
 	case kStopRequested:
-		AudioDeviceStop(inDevice, This->mOutputIOProc);
+		AudioDeviceStop(inDevice, OutputIOProc);
 		This->mOutputProcState = kOff;
 		return noErr;
 	default:
@@ -367,19 +361,6 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioObjectID			inDevice,
 	
 	return noErr;
 }
-
-OSStatus AudioThruEngine::OutputIOProc16 (	AudioObjectID			inDevice,
-											const AudioTimeStamp*	inNow,
-											const AudioBufferList*	inInputData,
-											const AudioTimeStamp*	inInputTime,
-											AudioBufferList*		outOutputData,
-											const AudioTimeStamp*	inOutputTime,
-											void*					inClientData)
-{
-	return AudioThruEngine::OutputIOProc (inDevice,inNow,inInputData,inInputTime,outOutputData,inOutputTime,inClientData);
-
-}
-
 
 UInt32 AudioThruEngine::GetOutputNchnls()
 {
