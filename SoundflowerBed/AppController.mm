@@ -14,14 +14,11 @@ OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
                                     void*                   inClientData)
 {
 	AppController *app = (AppController *) inClientData;
-    NSLog(@"DeviceListenerProc fired with %d events", inNumberAddress);
 
 	for (int i = 0; i < inNumberAddress; i ++) {
         AudioObjectPropertyElement inSelectorID = inAddresses[i].mSelector;
         BOOL isInput = inAddresses[i].mScope == kAudioDevicePropertyScopeInput;
     
-        NSLog(@"DeviceListenerProc: event %c%c%c%c (isinput: %d)", inSelectorID >> 24, inSelectorID >> 16, inSelectorID >> 8, inSelectorID, isInput);
-        
         switch (inSelectorID) {
             case kAudioDevicePropertyNominalSampleRate:
                 if (isInput) {
@@ -62,14 +59,11 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 {  
 	AppController *app = (AppController *) x;
 
-    switch ( messageType ) {
+    switch (messageType) {
         case kIOMessageSystemWillSleep:
 			[NSThread detachNewThreadSelector:@selector(suspend) toTarget:app withObject:nil];
             IOAllowPowerChange(app->root_port, (long)messageArgument);
             break;
-			
-		case kIOMessageSystemWillNotSleep:
-			break;
 			
         case kIOMessageCanSystemSleep:
             IOAllowPowerChange(app->root_port, (long)messageArgument);
@@ -143,7 +137,6 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 
     UInt32 deviceArraySize = 0;
     verify_noerr(AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &devicesAddress, 0, NULL, &deviceArraySize));
-    NSLog(@"AudioObjects to scan: %d (bytes)", deviceArraySize);
     
     AudioDeviceID *devices = new AudioDeviceID[deviceArraySize / sizeof(AudioDeviceID)];
     verify_noerr(AudioObjectGetPropertyData(kAudioObjectSystemObject,
@@ -165,7 +158,6 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 
         UInt32 dataSize;
         verify_noerr(AudioObjectGetPropertyDataSize(aoID, &inputAddress, 0, NULL, &dataSize));
-        NSLog(@"Found device: %d with input descriptor size %d", aoID, dataSize);
         AudioDevice *dev = new AudioDevice(aoID, dataSize == 0);
         [devs addObject:[NSValue valueWithPointer:dev]];
     }
@@ -188,7 +180,11 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
         AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
         if (dev->mID == outputDev) {
             found = YES;
+            break;
         }
+    }
+    if (! found) {
+        [self outputDeviceSelected:[m2chOutputDevice itemAtIndex:0]];
     }
 }
 
@@ -351,6 +347,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
         NSAlert *alert = [[NSAlert alloc] init];
         alert.messageText = @"Soundflower audio device can not be found. Is the kernel driver running? (Tried to find device with name 'Soundflower (2ch)'";
         [alert runModal];
+        [alert release];
     }
 }
 
@@ -464,7 +461,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
         preset = 0;
     }
     int loudnessCorrection = mCur2chLoudness.title.intValue;
-    NSLog(@"Equalizer: preset: %@ (= %ld), loudness level: %@", mCur2chPreset.title, preset, mCur2chLoudness.title);
+    NSLog(@"Equalizer: preset: %@, loudness level: %@", mCur2chPreset.title, mCur2chLoudness.title);
     mThruEngine2->SetEqualizer(loudnessCorrection != 100 || preset != 0, presets[preset], loudnessCorrection);
 }
 

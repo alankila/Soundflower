@@ -1,5 +1,0 @@
-// Note: currently assumes that you are compiling with Xcode 3.2 on OS 10.6
-// Also assumes that you have done a 'custom' install of Xcode 3.2 and manually chosen to install the OS 10.4 SDK
-
-MACOSX_DEPLOYMENT_TARGET = 10.7
-MODULE_VERSION = 1.5.2

@@ -38,7 +38,6 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		222FE3510EBB6D9900FD13FC /* Soundflowerbed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Soundflowerbed.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		22952B1E104EC967003AF61F /* Soundflower.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Soundflower.xcconfig; path = ../Source/Soundflower.xcconfig; sourceTree = SOURCE_ROOT; };
 		229B366F0EDC1DB500623222 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
@@ -85,16 +84,16 @@
 			isa = PBXGroup;
 			children = (
 				9518870914B515FE004C4A69 /* DSP */,
-				F591DD850310A6BE01FEEC38 /* AppController.h */,
 				F591DD860310A6BE01FEEC38 /* AppController.mm */,
+				F591DD850310A6BE01FEEC38 /* AppController.h */,
+				F591DDB3031157A901FEEC38 /* AudioDevice.cpp */,
+				F591DDB2031157A901FEEC38 /* AudioDevice.h */,
+				F591DDAE0310C0D001FEEC38 /* AudioRingBuffer.cpp */,
+				F591DDAD0310C0D001FEEC38 /* AudioRingBuffer.h */,
+				F591DDB70311589801FEEC38 /* AudioThruEngine.cpp */,
+				F591DDB60311589801FEEC38 /* AudioThruEngine.h */,
 				F57307580312E91E01FEEC38 /* HelpWindowController.h */,
 				F57307570312E91E01FEEC38 /* HelpWindowController.m */,
-				F591DDAD0310C0D001FEEC38 /* AudioRingBuffer.h */,
-				F591DDAE0310C0D001FEEC38 /* AudioRingBuffer.cpp */,
-				F591DDB2031157A901FEEC38 /* AudioDevice.h */,
-				F591DDB3031157A901FEEC38 /* AudioDevice.cpp */,
-				F591DDB60311589801FEEC38 /* AudioThruEngine.h */,
-				F591DDB70311589801FEEC38 /* AudioThruEngine.cpp */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -113,7 +112,6 @@
 				9518871C14B5CF35004C4A69 /* Cocoa.framework */,
 				9518871A14B5CF27004C4A69 /* IOKit.framework */,
 				9518871814B5CF1C004C4A69 /* CoreAudio.framework */,
-				22952B1E104EC967003AF61F /* Soundflower.xcconfig */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -291,45 +289,23 @@
 		};
 		222FE34D0EBB6D9900FD13FC /* Development */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 22952B1E104EC967003AF61F /* Soundflower.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = "";
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = Soundflowerbed;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 			};
 			name = Development;
 		};
 		222FE34E0EBB6D9900FD13FC /* Deployment */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 22952B1E104EC967003AF61F /* Soundflower.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				COPY_PHASE_STRIP = YES;
-				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = Soundflowerbed;
 				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 			};
 			name = Deployment;
 		};

@@ -63,8 +63,6 @@ void	AudioDevice::Init(AudioObjectID devid, bool isInput)
     propertyAddress.mSelector = kAudioDevicePropertyBufferFrameSize;
     verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mBufferSizeFrames));
 	
-    fprintf(stderr, "Constructed buffer with %d frames and safety offset %d\n", mBufferSizeFrames, mSafetyOffset);
-    
 	UpdateFormat();
 }
 
@@ -77,7 +75,6 @@ void	AudioDevice::UpdateFormat()
     };
 	UInt32 propsize = sizeof(mFormat);
     verify_noerr(AudioObjectGetPropertyData(mID, &propertyAddress, 0, NULL, &propsize, &mFormat));
-    fprintf(stderr, "Determined sampling rate: %lf\n", mFormat.mSampleRate);
 }
 
 void	AudioDevice::SetBufferSize(UInt32 size)
