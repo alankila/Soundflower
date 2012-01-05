@@ -21,7 +21,7 @@
 #include <math.h>
 
 EffectEqualizer::EffectEqualizer()
-    : mLoudnessAdjustment(10000.f), mLoudness(50.f), mNextUpdate(0), mNextUpdateInterval(1000), mPowerSquared(0), mFade(0)
+    : mLoudnessAdjustment(10000.f), mLoudness(50.f), mNextUpdate(0), mNextUpdateInterval(1000), mPowerSquared(0)
 {
     for (int32_t i = 0; i < 6; i ++) {
         mBand[i] = 0;
@@ -38,8 +38,8 @@ void EffectEqualizer::setBand(int32_t band, float dB) {
     mBand[band] = dB;
 }
 
-void EffectEqualizer::setLoudnessCorrection(int16_t value) {
-    mLoudnessAdjustment = value / 100.0f;
+void EffectEqualizer::setLoudnessCorrection(int16_t dB) {
+    mLoudnessAdjustment = dB;
 }
 
 /* Source material: ISO 226:2003 curves.
@@ -82,7 +82,7 @@ float EffectEqualizer::getAdjustedBand(int32_t band) {
     loudnessLevel = (loudnessLevel - 20) / (100 - 20);
     f += adj[band] * (1. - loudnessLevel);
 
-    return f * (mFade / 100.f);
+    return f;
 }
 
 void EffectEqualizer::refreshBands()
@@ -110,13 +110,6 @@ void EffectEqualizer::process(float& tmpL, float& tmpR)
             mLoudness -= 0.1;
         } else {
             mLoudness = signalPowerDb;
-        }
-
-        if (mFade < 100) {
-            mFade += 1;
-        }
-        if (mFade > 0) {
-            mFade -= 1;
         }
 
         /* Update EQ. */

@@ -29,7 +29,6 @@
 		222FE3490EBB6D9900FD13FC /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		222FE34A0EBB6D9900FD13FC /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F591DD8D0310AAC801FEEC38 /* CoreAudio.framework */; };
 		222FE34B0EBB6D9900FD13FC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9E9CD2F08E78DA30024DA5B /* IOKit.framework */; };
-		22952B1F104EC967003AF61F /* Soundflower.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 22952B1E104EC967003AF61F /* Soundflower.xcconfig */; };
 		9518870714B511C7004C4A69 /* DelayLine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9518870514B511C7004C4A69 /* DelayLine.cpp */; };
 		9518870814B511C7004C4A69 /* DelayLine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9518870614B511C7004C4A69 /* DelayLine.h */; };
 		9571CC2E14B505F200569B69 /* Biquad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC2C14B505F100569B69 /* Biquad.cpp */; };
@@ -245,6 +244,9 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
 			buildConfigurationList = 222FE2FF0EBB5DD500FD13FC /* Build configuration list for PBXProject "Soundflowerbed" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
@@ -272,7 +274,6 @@
 				222FE33D0EBB6D9900FD13FC /* sf2.tiff in Resources */,
 				222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */,
 				222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */,
-				22952B1F104EC967003AF61F /* Soundflower.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,10 +340,10 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				ONLY_ACTIVE_ARCH = YES;
@@ -362,8 +363,8 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
 				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = Soundflowerbed;

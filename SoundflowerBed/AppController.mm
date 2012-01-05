@@ -389,38 +389,48 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 {
 	NSMenuItem *item;
 
-	mMenu = [[NSMenu alloc] initWithTitle:@"Main Menu"];
-		
-    m2chMenu = [mMenu addItemWithTitle:@"Soundflower (2ch)" action:@selector(doNothing) keyEquivalent:@""];
+	mMenu = [[NSMenu alloc] init];
+    
+    m2chMenu = [mMenu addItemWithTitle:@"Soundflower (2ch)" action:NULL keyEquivalent:@""];
+    [m2chMenu setEnabled:true];
     [m2chMenu setImage:[NSImage imageNamed:@"sf2"]];
     [m2chMenu setTarget:self];
         
     NSMenu *submenu = [[NSMenu alloc] initWithTitle:@"2ch submenu"];
-    NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
-    m2chBuffer = [[NSMenu alloc] initWithTitle:@"2ch Buffer"];
+    NSMenuItem *bufItem = [submenu addItemWithTitle:@"Buffer Size" action:NULL keyEquivalent:@""];
+    [bufItem setEnabled:true];
+    
+    m2chBuffer = [[NSMenu alloc] init];
     for (int i = 64; i < 4096; i *= 2) {
         item = [m2chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
         [item setTarget:self];
     }
-    [bufItem setSubmenu:m2chBuffer];
+    bufItem.submenu = m2chBuffer;
 
     [submenu addItem:[NSMenuItem separatorItem]];
-					
+
     [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
-    item = [submenu addItemWithTitle:@"Channel 1" action:@selector(doNothing) keyEquivalent:@""];
-    [item setTarget:self];	
-    item = [submenu addItemWithTitle:@"Channel 2" action:@selector(doNothing) keyEquivalent:@""];
-    [item setTarget:self];	
+    for (int i = 1; i < 3; i ++) {
+        item = [submenu addItemWithTitle:[NSString stringWithFormat:@"Channel %d", i] action:NULL keyEquivalent:@""];
+        [item setEnabled:true];
+    }
 		
     [submenu addItem:[NSMenuItem separatorItem]];
-    mCur2chHeadsetFiltering = [submenu addItemWithTitle:@"Headset filtering" action:@selector(headsetSelected:) keyEquivalent:@""];
-    [mCur2chHeadsetFiltering setTarget:self];
+    mCur2chVirtualizer = [submenu addItemWithTitle:@"Headset virtualization" action:@selector(headsetSelected:) keyEquivalent:@""];
+    [mCur2chVirtualizer setTarget:self];
+
+    m2chLoudness = [[NSMenu alloc] init];
+    for (int i = 10; i <= 100; i += 10) {
+        item = [m2chLoudness addItemWithTitle:[NSString stringWithFormat:@"%d dB", i] action:@selector(loudnessChanged:) keyEquivalent:@""];
+        [item setTarget:self];
+    }
+    item = [submenu addItemWithTitle:@"Loudness compensation" action:NULL keyEquivalent:@""];
+    item.submenu = m2chLoudness;
     
-    [m2chMenu setSubmenu:submenu];
+    m2chMenu.submenu = submenu;
 
     item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
     [item setTarget:self];
-    [item setState:NSOnState];
     mCur2chDevice = item;
 		
     AudioDeviceList::DeviceList &thelist = mOutputDeviceList->GetList();
@@ -436,14 +446,16 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 	
 	[mMenu addItem:[NSMenuItem separatorItem]];
 	
-    m16chMenu = [mMenu addItemWithTitle:@"Soundflower (16ch)" action:@selector(doNothing) keyEquivalent:@""];
+    m16chMenu = [mMenu addItemWithTitle:@"Soundflower (16ch)" action:NULL keyEquivalent:@""];
+    [m16chMenu setEnabled:true];
     [m16chMenu setImage:[NSImage imageNamed:@"sf16"]];
     [m16chMenu setTarget:self];
     m16StartIndex = [mMenu indexOfItem:m16chMenu];
-    submenu = [[NSMenu alloc] initWithTitle:@"16ch submenu"];
+    submenu = [[NSMenu alloc] init];
         
-    bufItem = [submenu addItemWithTitle:@"Buffer Size" action:@selector(doNothing) keyEquivalent:@""];
-    m16chBuffer = [[NSMenu alloc] initWithTitle:@"16ch Buffer"];
+    bufItem = [submenu addItemWithTitle:@"Buffer Size" action:NULL keyEquivalent:@""];
+    [bufItem setEnabled:true];
+    m16chBuffer = [[NSMenu alloc] init];
     for (int i = 64; i < 4096; i *= 2) {
         item = [m16chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged16ch:) keyEquivalent:@""];
         [item setTarget:self];
@@ -454,14 +466,13 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 			
     [submenu addItemWithTitle:@"Routing" action:NULL keyEquivalent:@""];
     for (int i = 1; i <= 16; i ++) {
-        item = [submenu addItemWithTitle:[NSString stringWithFormat:@"Channel %d", i] action:@selector(doNothing) keyEquivalent:@""];
-        [item setTarget:self];	
+        item = [submenu addItemWithTitle:[NSString stringWithFormat:@"Channel %d", i] action:NULL keyEquivalent:@""];
+        [item setEnabled:true];
     }
     [m16chMenu setSubmenu:submenu];
 		
     item = [mMenu addItemWithTitle:@"None (OFF)" action:@selector(outputDeviceSelected:) keyEquivalent:@""];
     [item setTarget:self];
-    [item setState:NSOnState];
     mCur16chDevice = item;
 		
     thelist = mOutputDeviceList->GetList();
@@ -678,16 +689,24 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
 
 - (IBAction)equalizerChanged:(id)sender
 {
-    float presets[][6] = {
-        { 0, 0, 0, 0, 0 }
-    };
-    int preset = 0;
-    int loudnessCorrection = 100;
-    gThruEngine2->SetEqualizer(preset != 0 && loudnessCorrection != 100, presets[preset], loudnessCorrection);
+// gThruEngine2->SetEqualizer(preset != 0 && loudnessCorrection != 100, presets[preset], loudnessCorrection);
 }
 
-- (void)doNothing
+- (IBAction)loudnessChanged:(id)sender
 {
+    for (NSMenuItem *item in m2chLoudness.itemArray) {
+        item.state = NSOffState;
+    }
+    [sender setState:NSOnState];
+    
+    float presets[][6] = {
+        { 0, 0, 0, 0, 0, 0 }
+    };
+    
+    int preset = 0;
+    int loudnessCorrection = [[sender title] intValue];
+    NSLog(@"Loudness level: %d", loudnessCorrection);
+    gThruEngine2->SetEqualizer(loudnessCorrection != 100, presets[preset], loudnessCorrection);
 }
 
 - (void)readGlobalPrefs
@@ -728,14 +747,19 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     }
     [self bufferSizeChanged16ch:[m16chBuffer itemWithTitle:v]];
     
-    v = [defaults valueForKey:@"headsetFiltering"];
+    v = [defaults valueForKey:@"virtualizer"];
     if (! v) {
         v = @"0";
     }
     /* State will be flipped by headsetSelected, so it appears inverted here. */
-    mCur2chHeadsetFiltering.state = [v intValue] ? NSOffState : NSOnState;
-    [self headsetSelected:mCur2chHeadsetFiltering];
-    
+    mCur2chVirtualizer.state = [v intValue] ? NSOffState : NSOnState;
+    [self headsetSelected:mCur2chVirtualizer];
+
+    v = [defaults valueForKey:@"loudness"];
+    if (! v) {
+        v = @"100 dB";
+    }
+    [self loudnessChanged:[m2chLoudness itemWithTitle:v]];
 }
 		
 - (void)writeGlobalPrefs
@@ -745,7 +769,8 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     [defaults setValue:mCur16chDevice.title forKey:@"16ch"];
     [defaults setValue:mCur2chBuffer.title forKey:@"2chBuf"];
     [defaults setValue:mCur16chBuffer.title forKey:@"16chBuf"];
-    [defaults setValue:[NSString stringWithFormat:@"%ld", mCur2chHeadsetFiltering.state] forKey:@"headsetFiltering"];
+    [defaults setValue:[NSString stringWithFormat:@"%ld", mCur2chVirtualizer.state] forKey:@"virtualizer"];
+    [defaults setValue:mCur2chLoudness.title forKey:@"loudness"];
     [defaults synchronize];
 }
 

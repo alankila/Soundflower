@@ -18,6 +18,9 @@
     /* The menu that gives 2ch buffer choices */
     NSMenu          *m16chBuffer;
     
+    /* DSP Menu: loudness compensation */
+    NSMenu          *m2chLoudness;
+    
 	BOOL			menuItemVisible;
 	int				m16StartIndex;
 	
@@ -25,7 +28,8 @@
 	NSMenuItem		*mCur2chBuffer;
 	NSMenuItem		*mCur16chDevice;
 	NSMenuItem		*mCur16chBuffer;
-    NSMenuItem      *mCur2chHeadsetFiltering;
+    NSMenuItem      *mCur2chVirtualizer;
+    NSMenuItem      *mCur2chLoudness;
 	
 	NSMenuItem		*mSuspended2chDevice;
 	NSMenuItem		*mSuspended16chDevice;
@@ -60,6 +64,8 @@
 - (IBAction)bufferSizeChanged16ch:(id)sender;
 - (IBAction)routingChanged2ch:(id)sender;
 - (IBAction)routingChanged16ch:(id)sender;
+- (IBAction)equalizerChanged:(id)sender;
+- (IBAction)loudnessChanged:(id)sender;
 
 - (void)buildRoutingMenu:(BOOL)is2ch;
 - (void)buildDeviceList;

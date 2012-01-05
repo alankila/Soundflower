@@ -14,10 +14,7 @@ class EffectEqualizer {
     float mLoudness;
     int32_t mNextUpdate;
     int32_t mNextUpdateInterval;
-    int64_t mPowerSquared;
-
-    /* Smooth enable/disable */
-    int32_t mFade;
+    float mPowerSquared;
 
     float getAdjustedBand(int32_t idx);
     void refreshBands();
