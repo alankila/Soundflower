@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>Soundflowerbed</string>
 	<key>CFBundleIconFile</key>
-	<string>icon.png</string>
+	<string>appicon.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>fi.bel.DSPX</string>
 	<key>CFBundleInfoDictionaryVersion</key>

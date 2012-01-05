@@ -36,9 +36,9 @@
 		95F47F9714B6638200359B86 /* FrequencyResponseWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */; };
 		95F47F9814B6638200359B86 /* FrequencyResponseWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95F47F9514B6638200359B86 /* FrequencyResponseWindowController.m */; };
 		95F47F9914B6638200359B86 /* FrequencyResponseWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9614B6638200359B86 /* FrequencyResponseWindowController.xib */; };
-		95F47F9B14B6671900359B86 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9A14B6671900359B86 /* icon.png */; };
 		95F47F9E14B6681900359B86 /* menu-active.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9C14B6681900359B86 /* menu-active.png */; };
 		95F47F9F14B6681900359B86 /* menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9D14B6681900359B86 /* menu.png */; };
+		95F47FA114B66FD000359B86 /* appicon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 95F47FA014B66FD000359B86 /* appicon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,9 +63,9 @@
 		95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyResponseWindowController.h; sourceTree = "<group>"; };
 		95F47F9514B6638200359B86 /* FrequencyResponseWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyResponseWindowController.m; sourceTree = "<group>"; };
 		95F47F9614B6638200359B86 /* FrequencyResponseWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FrequencyResponseWindowController.xib; sourceTree = "<group>"; };
-		95F47F9A14B6671900359B86 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		95F47F9C14B6681900359B86 /* menu-active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-active.png"; sourceTree = "<group>"; };
 		95F47F9D14B6681900359B86 /* menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu.png; sourceTree = "<group>"; };
+		95F47FA014B66FD000359B86 /* appicon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appicon.icns; sourceTree = "<group>"; };
 		F57307570312E91E01FEEC38 /* HelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = HelpWindowController.m; sourceTree = "<group>"; };
 		F57307580312E91E01FEEC38 /* HelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = HelpWindowController.h; sourceTree = "<group>"; };
 		F591DD850310A6BE01FEEC38 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -149,9 +149,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				95F47FA014B66FD000359B86 /* appicon.icns */,
 				95F47F9C14B6681900359B86 /* menu-active.png */,
 				95F47F9D14B6681900359B86 /* menu.png */,
-				95F47F9A14B6671900359B86 /* icon.png */,
 				229B366F0EDC1DB500623222 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 			);
@@ -248,9 +248,9 @@
 				222FE33A0EBB6D9900FD13FC /* HelpWindowController.nib in Resources */,
 				222FE33B0EBB6D9900FD13FC /* InfoPlist.strings in Resources */,
 				95F47F9914B6638200359B86 /* FrequencyResponseWindowController.xib in Resources */,
-				95F47F9B14B6671900359B86 /* icon.png in Resources */,
 				95F47F9E14B6681900359B86 /* menu-active.png in Resources */,
 				95F47F9F14B6681900359B86 /* menu.png in Resources */,
+				95F47FA114B66FD000359B86 /* appicon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
