@@ -10,60 +10,50 @@
 
 AudioThruEngine	*gThruEngine2 = NULL;
 
-OSStatus	HardwareListenerProc (	AudioHardwarePropertyID	inPropertyID,
-                                    void*					inClientData)
-{
-	AppController *app = (AppController *)inClientData;
-    switch(inPropertyID)
-    { 
-        case kAudioHardwarePropertyDevices:
-       		// An audio device has been added or removed to the system, so lets just start over
-			[NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];	
-            break;			
-    }
-    
-    return (noErr);
-}
-
-OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
-                                    UInt32                  inChannel,
-                                    Boolean                 isInput,
-                                    AudioDevicePropertyID   inPropertyID,
+OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
+                                    UInt32                  inNumberAddress,
+                                    const AudioObjectPropertyAddress *inAddresses,
                                     void*                   inClientData)
 {
-	AppController *app = (AppController *)inClientData;
+	AppController *app = (AppController *) inClientData;
+    NSLog(@"DeviceListenerProc fired with %d events", inNumberAddress);
+
+	for (int i = 0; i < inNumberAddress; i ++) {
+        AudioObjectPropertyElement inSelectorID = inAddresses[i].mSelector;
+        BOOL isInput = inAddresses[i].mScope == kAudioDevicePropertyScopeInput;
+    
+        NSLog(@"DeviceListenerProc: event %c%c%c%c (isinput: %d)", inSelectorID >> 24, inSelectorID >> 16, inSelectorID >> 8, inSelectorID, isInput);
+        
+        switch (inSelectorID) {
+            case kAudioDevicePropertyNominalSampleRate:
+                if (isInput) {
+                    if (gThruEngine2->IsRunning() && gThruEngine2->GetInputDevice() == inDevice) {
+                        [NSThread detachNewThreadSelector:@selector(srChanged2ch) toTarget:app withObject:nil];
+                    }
+                } else {
+                    if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice) {
+                        [NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
+                    }
+                }
+                break;
 	
-    switch(inPropertyID)
-    {		
-        case kAudioDevicePropertyNominalSampleRate:
-			if (isInput) {
-				if (gThruEngine2->IsRunning() && gThruEngine2->GetInputDevice() == inDevice)	
-					[NSThread detachNewThreadSelector:@selector(srChanged2ch) toTarget:app withObject:nil];
-			} 
-			else {
-				if (inChannel == 0) {
-					if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
-						[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
-				}
-			}
-			break;
-	
-		case kAudioDevicePropertyDataSource:
-			if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
-				[NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
-			break;
+            case kAudioDevicePropertyDataSource:
+                if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
+                    [NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
+                break;
 			
-		case kAudioDevicePropertyStreams:
-		case kAudioDevicePropertyStreamConfiguration:
-			if (!isInput) {
-				if (inChannel == 0) {
+            case kAudioHardwarePropertyDevices:
+            case kAudioDevicePropertyStreams:
+            case kAudioDevicePropertyStreamConfiguration:
+                if (!isInput) {
                     [NSThread detachNewThreadSelector:@selector(refreshDevices) toTarget:app withObject:nil];	
-				}
-			}
-			break;
+                }
+                break;
 		
-		default:
-			break;
+            default:
+                break;
+        
+        }
 	}
 	
 	return noErr;
@@ -79,9 +69,9 @@ OSStatus	DeviceListenerProc (	AudioDeviceID           inDevice,
 io_connect_t  root_port;
 
 void
-MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageArgument)
+MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArgument)
 {  
-	AppController *app = (AppController *)x;
+	AppController *app = (AppController *) x;
 
     switch ( messageType ) {
         case kIOMessageSystemWillSleep:
@@ -218,20 +208,14 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     for (NSValue *wrap in mOutputDeviceList) {
         AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
         NSString *name = (NSString *) dev->GetName();
-        
-		if ([name isEqualTo:@"Soundflower (2ch)"] || [name isEqualTo:@"Soundflower (16ch)"]) {
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));			
-		} else {
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc, self));
-			verify_noerr (AudioDeviceAddPropertyListener(dev->mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc, self));
-		}
+        NSLog(@"Adding general wildcard listener to: %@", name);
+        AudioObjectPropertyAddress property = {
+            kAudioObjectPropertySelectorWildcard,
+            kAudioObjectPropertyScopeWildcard,
+            kAudioObjectPropertyElementWildcard
+        };
+        verify_noerr(AudioObjectAddPropertyListener(dev->mID, &property, DeviceListenerProc, self));
 	}
-		
-	// check for added/removed devices
-    verify_noerr (AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc, self));   
 }
 
 - (void)RemoveListeners
@@ -239,20 +223,14 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     for (NSValue *wrap in mOutputDeviceList) {
         AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
         NSString *name = (NSString *) dev->GetName();
-
-		if ([name isEqualTo:@"Soundflower (2ch)"] || [name isEqualTo:@"Soundflower (16ch)"]) {
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, true, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, true, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
-		}
-		else {
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyNominalSampleRate, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreamConfiguration, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyStreams, DeviceListenerProc));
-			verify_noerr (AudioDeviceRemovePropertyListener(dev->mID, 0, false, kAudioDevicePropertyDataSource, DeviceListenerProc));
-		}
+        NSLog(@"Removing general wildcard listener from: %@", name);
+        AudioObjectPropertyAddress property = {
+            kAudioObjectPropertySelectorWildcard,
+            kAudioObjectPropertyScopeWildcard,
+            kAudioObjectPropertyElementWildcard
+        };
+        verify_noerr(AudioObjectRemovePropertyListener(dev->mID, &property, DeviceListenerProc, self));
 	}
-
-    verify_noerr (AudioHardwareRemovePropertyListener(kAudioHardwarePropertyDevices, HardwareListenerProc));
 }
 
 - (id)init
