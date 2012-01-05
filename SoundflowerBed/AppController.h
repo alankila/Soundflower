@@ -3,6 +3,14 @@
 #import <Cocoa/Cocoa.h>
 #import <CoreAudio/CoreAudio.h>
 
+#include <mach/mach_port.h>
+#include <mach/mach_interface.h>
+#include <mach/mach_init.h>
+
+#include <IOKit/pwr_mgt/IOPMLib.h>
+#include <IOKit/IOMessage.h>
+
+#import "AudioThruEngine.h"
 #import "HelpWindowController.h"
 
 @interface AppController : NSObject<NSApplicationDelegate>
@@ -33,8 +41,11 @@
 	NSMenuItem		*mSuspended2chDevice;
 	
 	AudioObjectID	mSoundflower2Device;
-    NSArray        *mOutputDeviceList;
-	
+    NSArray         *mOutputDeviceList;
+
+	AudioThruEngine *mThruEngine2;
+    io_connect_t  root_port;
+
 	IBOutlet HelpWindowController *mAboutController;
 }
 

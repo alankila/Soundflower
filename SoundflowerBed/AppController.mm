@@ -8,8 +8,6 @@
 
 @implementation AppController
 
-AudioThruEngine	*gThruEngine2 = NULL;
-
 OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
                                     UInt32                  inNumberAddress,
                                     const AudioObjectPropertyAddress *inAddresses,
@@ -27,18 +25,18 @@ OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
         switch (inSelectorID) {
             case kAudioDevicePropertyNominalSampleRate:
                 if (isInput) {
-                    if (gThruEngine2->IsRunning() && gThruEngine2->GetInputDevice() == inDevice) {
+                    if (app->mThruEngine2->IsRunning() && app->mThruEngine2->GetInputDevice() == inDevice) {
                         [NSThread detachNewThreadSelector:@selector(srChanged2ch) toTarget:app withObject:nil];
                     }
                 } else {
-                    if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice) {
+                    if (app->mThruEngine2->IsRunning() && app->mThruEngine2->GetOutputDevice() == inDevice) {
                         [NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
                     }
                 }
                 break;
 	
             case kAudioDevicePropertyDataSource:
-                if (gThruEngine2->IsRunning() && gThruEngine2->GetOutputDevice() == inDevice)
+                if (app->mThruEngine2->IsRunning() && app->mThruEngine2->GetOutputDevice() == inDevice)
                     [NSThread detachNewThreadSelector:@selector(srChanged2chOutput) toTarget:app withObject:nil];
                 break;
 			
@@ -59,15 +57,6 @@ OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
 	return noErr;
 }
 
-#include <mach/mach_port.h>
-#include <mach/mach_interface.h>
-#include <mach/mach_init.h>
-
-#include <IOKit/pwr_mgt/IOPMLib.h>
-#include <IOKit/IOMessage.h>
-
-io_connect_t  root_port;
-
 void
 MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArgument)
 {  
@@ -76,14 +65,14 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     switch ( messageType ) {
         case kIOMessageSystemWillSleep:
 			[NSThread detachNewThreadSelector:@selector(suspend) toTarget:app withObject:nil];
-            IOAllowPowerChange(root_port, (long)messageArgument);
+            IOAllowPowerChange(app->root_port, (long)messageArgument);
             break;
 			
 		case kIOMessageSystemWillNotSleep:
 			break;
 			
         case kIOMessageCanSystemSleep:
-            IOAllowPowerChange(root_port, (long)messageArgument);
+            IOAllowPowerChange(app->root_port, (long)messageArgument);
             break;
 
         case kIOMessageSystemHasPoweredOn:
@@ -113,8 +102,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	gThruEngine2->Mute();
-	OSStatus err = gThruEngine2->MatchSampleRate(true);
+	mThruEngine2->Mute();
+	OSStatus err = mThruEngine2->MatchSampleRate(true);
 			
 	NSMenuItem *curdev = mCur2chDevice;
 	[self outputDeviceSelected:Nil];
@@ -122,7 +111,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 		[self outputDeviceSelected:curdev];
 	}
 	
-	gThruEngine2->Mute(false);
+	mThruEngine2->Mute(false);
 	
 	[pool release];
 }
@@ -132,15 +121,15 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-	gThruEngine2->Mute();
-	OSStatus err = gThruEngine2->MatchSampleRate(false);
+	mThruEngine2->Mute();
+	OSStatus err = mThruEngine2->MatchSampleRate(false);
 			
 	NSMenuItem		*curdev = mCur2chDevice;
 	[self outputDeviceSelected:Nil];
 	if (err == kAudioHardwareNoError) {
 		[self outputDeviceSelected:curdev];
 	}
-	gThruEngine2->Mute(false);
+	mThruEngine2->Mute(false);
 	
 	[pool release];
 }
@@ -194,7 +183,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	[self buildMenu];
     
     BOOL found = NO;
-	AudioObjectID outputDev = gThruEngine2->GetOutputDevice();
+	AudioObjectID outputDev = mThruEngine2->GetOutputDevice();
     for (NSValue *wrap in mOutputDeviceList) {
         AudioDevice *dev = (AudioDevice *) wrap.pointerValue;
         if (dev->mID == outputDev) {
@@ -252,8 +241,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
         [mOutputDeviceList release];
         mOutputDeviceList = Nil;
 	}
-    delete gThruEngine2;
-    gThruEngine2 = NULL;
+    delete mThruEngine2;
+    mThruEngine2 = NULL;
 	[super dealloc];
 }
 
@@ -393,9 +382,9 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	[self buildMenu];
 	
 	if (mSoundflower2Device) {
-		gThruEngine2 = new AudioThruEngine();
-		gThruEngine2->SetInputDevice(mSoundflower2Device);
-		gThruEngine2->Start();
+		mThruEngine2 = new AudioThruEngine();
+		mThruEngine2->SetInputDevice(mSoundflower2Device);
+		mThruEngine2->Start();
 	}
     [self readGlobalPrefs];
 	
@@ -414,8 +403,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
-	if (gThruEngine2) {
-		gThruEngine2->Stop();
+	if (mThruEngine2) {
+		mThruEngine2->Stop();
     }
 
     [self writeGlobalPrefs];
@@ -432,7 +421,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 
 	UInt32 size = [[sender title] intValue];
     NSLog(@"2ch buffer: %@", [sender title]);
-	gThruEngine2->SetBufferSize(size);
+	mThruEngine2->SetBufferSize(size);
 }
 
 - (IBAction)outputDeviceSelected:(id)sender
@@ -444,13 +433,13 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     mCur2chDevice.state = NSOnState;
     
     NSLog(@"Changing 2ch device to: %@", mCur2chDevice.title);
-    gThruEngine2->SetOutputDevice(mCur2chDevice != Nil ? mCur2chDevice.tag : kAudioDeviceUnknown);
+    mThruEngine2->SetOutputDevice(mCur2chDevice != Nil ? mCur2chDevice.tag : kAudioDeviceUnknown);
 }
 
 - (IBAction)headsetSelected:(id)sender
 {
     mCur2chVirtualizer.state = !mCur2chVirtualizer.state;
-    gThruEngine2->SetVirtualizer(mCur2chVirtualizer.state, 500);
+    mThruEngine2->SetVirtualizer(mCur2chVirtualizer.state, 500);
 }
 
 - (void)equalizerChanged
@@ -476,7 +465,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     }
     int loudnessCorrection = mCur2chLoudness.title.intValue;
     NSLog(@"Equalizer: preset: %@ (= %ld), loudness level: %@", mCur2chPreset.title, preset, mCur2chLoudness.title);
-    gThruEngine2->SetEqualizer(loudnessCorrection != 100 || preset != 0, presets[preset], loudnessCorrection);
+    mThruEngine2->SetEqualizer(loudnessCorrection != 100 || preset != 0, presets[preset], loudnessCorrection);
 }
 
 - (IBAction)presetChanged:(id)sender
