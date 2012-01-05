@@ -14,27 +14,27 @@
     NSMenu          *m2chOutputDevice;
     /* Buffer size menu */
     NSMenu          *m2chBuffer;
+    /* Equalizer preset menu */
+    NSMenu          *m2chPreset;
     /* Loudness compensation menu */
     NSMenu          *m2chLoudness;
     
-	BOOL			menuItemVisible;
-	
     /* Output device submenu selection */
     NSMenuItem		*mCur2chDevice;
     /* Buffer size submenu selection */
 	NSMenuItem		*mCur2chBuffer;
-    /* Virtualizer tick mark item */
-    NSMenuItem      *mCur2chVirtualizer;
+    /* Preset compensation selection */
+    NSMenuItem      *mCur2chPreset;
     /* Loudness compensation selection */
     NSMenuItem      *mCur2chLoudness;
-	
+    /* Virtualizer tick mark item */
+    NSMenuItem      *mCur2chVirtualizer;
+	/* Temporary stash for the value of the current 2ch output device while system is suspended. */
 	NSMenuItem		*mSuspended2chDevice;
 	
 	AudioDeviceID	mSoundflower2Device;
 	
 	AudioDeviceList *mOutputDeviceList;	
-	
-	UInt32 mNchnls2;
 	
 	IBOutlet HelpWindowController *mAboutController;
 }
@@ -44,7 +44,6 @@
 
 - (IBAction)srChanged2ch;
 - (IBAction)srChanged2chOutput;
-- (IBAction)checkNchnls;
 
 - (IBAction)refreshDevices;
 
