@@ -63,12 +63,7 @@ AudioThruEngine::AudioThruEngine() :
     mEqualizerEnabled(false),
     mVirtualizerEnabled(false)
 {
-//	mErrorMessage[0] = '\0';
 	mInputBuffer = new AudioRingBuffer(4, 88200);
-	
-	// init routing map to default chan->chan
-	for (int i = 0; i < 16; i++)
-		mChannelMap[i] = i;
 }
 
 AudioThruEngine::~AudioThruEngine()
@@ -326,62 +321,35 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioDeviceID			inDevice,
 				
 		UInt32 innchnls = This->mInputDevice.mFormat.mChannelsPerFrame;
 		
-		UInt32 chanstart[16];
         for (UInt32 buf = 0; buf < outOutputData->mNumberBuffers; buf ++) {
-			for (int i = 0; i < 16; i++) {
-				chanstart[i] = 0;
-            }
 			UInt32 outnchnls = outOutputData->mBuffers[buf].mNumberChannels;
             
-            if (innchnls == 2 && outnchnls == 2) {
-                UInt32 outChan1 = This->GetChannelMap(0) - chanstart[0];
-                UInt32 outChan2 = This->GetChannelMap(1) - chanstart[1];
-                if (outChan1 < outnchnls && outChan2 < outnchnls) {
-                    float *in = (float *) This->mWorkBuf;
-                    float *out = (float *) outOutputData->mBuffers[buf].mData + outChan1;
-                    SInt32 outIdx = outChan2 - outChan1;
+            if (innchnls != 2 && outnchnls != 2) {
+                continue;
+            }
+            
+            float *in = (float *) This->mWorkBuf;
+            float *out = (float *) outOutputData->mBuffers[buf].mData;
 
-                    UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
-                    for (UInt32 frame = 0; frame < frames; frame += 1) {
-                        float l = in[0];
-                        float r = in[1];
+            UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
+            for (UInt32 frame = 0; frame < frames; frame += 1) {
+                float l = in[0];
+                float r = in[1];
                         
-                        if (This->mVirtualizerEnabled) {
-                            This->mEffectVirtualizer.process(l, r);
-                        }
-                        if (This->mEqualizerEnabled) {
-                            This->mEffectEqualizer.process(l, r);
-                        }
-                        
-                        out[0     ] += l;
-                        out[outIdx] += r;
-                        
-                        in += innchnls;
-                        out += outnchnls;
-                    }
+                if (This->mVirtualizerEnabled) {
+                    This->mEffectVirtualizer.process(l, r);
+                }
+                if (This->mEqualizerEnabled) {
+                    This->mEffectEqualizer.process(l, r);
                 }
                     
-                chanstart[0] += outnchnls;
-                chanstart[1] += outnchnls;
-            } else {
-                for (UInt32 chan = 0; chan < innchnls; chan ++) {
-                    UInt32 outChan = This->GetChannelMap(chan) - chanstart[chan];		
-                    if (outChan < outnchnls) {
-                        float *in = (float *) This->mWorkBuf + (chan % innchnls); 
-                        float *out = (float *) outOutputData->mBuffers[buf].mData + outChan;		
-                        UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
-
-                        for (UInt32 frame = 0; frame < frames; frame += 1) {
-                            *out += *in;
-                            in += innchnls;
-                            out += outnchnls;
-                        }
-                    }
+                out[0] += l;
+                out[1] += r;
                 
-                    chanstart[chan] += outnchnls;
-                }
-			}
-		}
+                in += 2;
+                out += 2;
+            }
+        }
 		
 		This->mThruTime = delta;
 		

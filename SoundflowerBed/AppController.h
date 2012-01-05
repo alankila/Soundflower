@@ -8,42 +8,33 @@
 @interface AppController : NSObject<NSApplicationDelegate>
 {
 	NSStatusItem	*mSbItem;
+    /* Top-level menu */
 	NSMenu			*mMenu;
-    /* The "2ch menu" */
-	NSMenuItem		*m2chMenu;
-    /* The menu that gives 2ch buffer choices */
+    /* Output device menu */
+    NSMenu          *m2chOutputDevice;
+    /* Buffer size menu */
     NSMenu          *m2chBuffer;
-    /* The "16ch menu" */
-	NSMenuItem		*m16chMenu;
-    /* The menu that gives 2ch buffer choices */
-    NSMenu          *m16chBuffer;
-    
-    /* DSP Menu: loudness compensation */
+    /* Loudness compensation menu */
     NSMenu          *m2chLoudness;
     
 	BOOL			menuItemVisible;
-	int				m16StartIndex;
 	
-	NSMenuItem		*mCur2chDevice;
+    /* Output device submenu selection */
+    NSMenuItem		*mCur2chDevice;
+    /* Buffer size submenu selection */
 	NSMenuItem		*mCur2chBuffer;
-	NSMenuItem		*mCur16chDevice;
-	NSMenuItem		*mCur16chBuffer;
+    /* Virtualizer tick mark item */
     NSMenuItem      *mCur2chVirtualizer;
+    /* Loudness compensation selection */
     NSMenuItem      *mCur2chLoudness;
 	
 	NSMenuItem		*mSuspended2chDevice;
-	NSMenuItem		*mSuspended16chDevice;
 	
-	AudioDeviceID				mSoundflower2Device;
-	AudioDeviceID				mSoundflower16Device;
+	AudioDeviceID	mSoundflower2Device;
 	
-	AudioDeviceList *			mOutputDeviceList;	
+	AudioDeviceList *mOutputDeviceList;	
 	
 	UInt32 mNchnls2;
-	UInt32 mNchnls16;
-	
-	UInt32 mMenuID2[64];
-	UInt32 mMenuID16[64];
 	
 	IBOutlet HelpWindowController *mAboutController;
 }
@@ -52,22 +43,16 @@
 - (IBAction)resume;
 
 - (IBAction)srChanged2ch;
-- (IBAction)srChanged16ch;
 - (IBAction)srChanged2chOutput;
-- (IBAction)srChanged16chOutput;
 - (IBAction)checkNchnls;
 
 - (IBAction)refreshDevices;
 
 - (IBAction)outputDeviceSelected:(id)sender;
 - (IBAction)bufferSizeChanged2ch:(id)sender;
-- (IBAction)bufferSizeChanged16ch:(id)sender;
-- (IBAction)routingChanged2ch:(id)sender;
-- (IBAction)routingChanged16ch:(id)sender;
-- (IBAction)equalizerChanged:(id)sender;
+- (IBAction)presetChanged:(id)sender;
 - (IBAction)loudnessChanged:(id)sender;
 
-- (void)buildRoutingMenu:(BOOL)is2ch;
 - (void)buildDeviceList;
 - (void)buildMenu;
 
@@ -76,8 +61,5 @@
 
 - (void)readGlobalPrefs;
 - (void)writeGlobalPrefs;
-
-- (void)readDevicePrefs:(BOOL)is2ch;
-- (void)writeDevicePrefs:(BOOL)is2ch;
 
 @end

@@ -78,9 +78,6 @@ public:
 	
 	OSStatus	MatchSampleRate(bool useInputDevice);
 	
-	void	SetChannelMap(int ch, int val) { mChannelMap[ch] = val; }
-	int		GetChannelMap(int ch) { return mChannelMap[ch]; }
-
     /* Public DSP API */
     void    SetVirtualizer(bool enabled, int16_t strength);
     void    SetEqualizer(bool enabled, float bands[6], float loudnessCorrection);
@@ -133,7 +130,6 @@ protected:
 	double			mInputLoad, mOutputLoad;
 	double			mThruTime;
 	
-	int				mChannelMap[16];
 	AudioDeviceIOProc mOutputIOProc;
 
 	Byte			*mWorkBuf;

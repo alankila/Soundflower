@@ -15,8 +15,6 @@
 		222FE3380EBB6D9900FD13FC /* HelpWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = F57307580312E91E01FEEC38 /* HelpWindowController.h */; };
 		222FE33A0EBB6D9900FD13FC /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		222FE33B0EBB6D9900FD13FC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
-		222FE33C0EBB6D9900FD13FC /* sf16.tiff in Resources */ = {isa = PBXBuildFile; fileRef = C9CCA5E606ED143E0076FAC2 /* sf16.tiff */; };
-		222FE33D0EBB6D9900FD13FC /* sf2.tiff in Resources */ = {isa = PBXBuildFile; fileRef = C9CCA5E706ED143E0076FAC2 /* sf2.tiff */; };
 		222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */; };
 		222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = C9CFAC1E06EFA390001BE11F /* appIcon.icns */; };
 		222FE3410EBB6D9900FD13FC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -57,8 +55,6 @@
 		9571CC3214B5111600569B69 /* EffectEqualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectEqualizer.h; sourceTree = "<group>"; };
 		9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EffectVirtualizer.cpp; sourceTree = "<group>"; };
 		9571CC3414B5111600569B69 /* EffectVirtualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectVirtualizer.h; sourceTree = "<group>"; };
-		C9CCA5E606ED143E0076FAC2 /* sf16.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sf16.tiff; sourceTree = "<group>"; };
-		C9CCA5E706ED143E0076FAC2 /* sf2.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = sf2.tiff; sourceTree = "<group>"; };
 		C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = menuIcon.tiff; sourceTree = "<group>"; };
 		C9CFAC1E06EFA390001BE11F /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
 		C9E9CD2F08E78DA30024DA5B /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -163,8 +159,6 @@
 			isa = PBXGroup;
 			children = (
 				C9CFAC1E06EFA390001BE11F /* appIcon.icns */,
-				C9CCA5E606ED143E0076FAC2 /* sf16.tiff */,
-				C9CCA5E706ED143E0076FAC2 /* sf2.tiff */,
 				C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				229B366F0EDC1DB500623222 /* Info.plist */,
@@ -270,8 +264,6 @@
 			files = (
 				222FE33A0EBB6D9900FD13FC /* MainMenu.nib in Resources */,
 				222FE33B0EBB6D9900FD13FC /* InfoPlist.strings in Resources */,
-				222FE33C0EBB6D9900FD13FC /* sf16.tiff in Resources */,
-				222FE33D0EBB6D9900FD13FC /* sf2.tiff in Resources */,
 				222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */,
 				222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */,
 			);
