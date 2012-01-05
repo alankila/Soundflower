@@ -493,8 +493,11 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     };
     
     NSInteger preset = [m2chPreset indexOfItem:mCur2chPreset];
+    if (preset < 0) {
+        preset = 0;
+    }
     int loudnessCorrection = mCur2chLoudness.title.intValue;
-    NSLog(@"Equalizer: preset: %@, loudness level: %@", mCur2chPreset.title, mCur2chLoudness.title);
+    NSLog(@"Equalizer: preset: %@ (= %ld), loudness level: %@", mCur2chPreset.title, preset, mCur2chLoudness.title);
     gThruEngine2->SetEqualizer(loudnessCorrection != 100 || preset != 0, presets[preset], loudnessCorrection);
 }
 
