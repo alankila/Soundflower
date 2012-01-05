@@ -15,7 +15,6 @@
 
 /* Begin PBXFileReference section */
 		00F55081007288EA11FF4F98 /* Kernel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Kernel.framework; path = System/Library/Frameworks/Kernel.framework; sourceTree = SDKROOT; };
-		2249EC7E0ED70C7E003C8357 /* Soundflower.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Soundflower.xcconfig; sourceTree = "<group>"; };
 		54D0ADA60A5E329B006380BD /* Soundflower.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Soundflower.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		789FB3540D62DE4E00C0F5C7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C93407620601317E002E6A19 /* SoundflowerDevice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SoundflowerDevice.h; sourceTree = "<group>"; };
@@ -38,7 +37,6 @@
 		089C166AFE841209C02AAC07 /* SampleAudioDriver */ = {
 			isa = PBXGroup;
 			children = (
-				2249EC7E0ED70C7E003C8357 /* Soundflower.xcconfig */,
 				247142CAFF3F8F9811CA285C /* Source */,
 				089C167CFE841241C02AAC07 /* Resources */,
 				19C28FB6FE9D52B211CA2CBB /* Products */,
@@ -172,28 +170,15 @@
 		548AD6D409CE873500241D17 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 			};
 			name = Development;
 		};
-		548AD6D509CE873500241D17 /* Deployment */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = (
-					i386,
-					x86_64,
-				);
-				INFOPLIST_FILE = "Info-SoundflowerDriver.plist";
-			};
-			name = Deployment;
-		};
 		54D0ADA20A5E329B006380BD /* Development */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2249EC7E0ED70C7E003C8357 /* Soundflower.xcconfig */;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(PROJECT_DIR)";
-				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
@@ -202,27 +187,23 @@
 				INSTALL_PATH = /../Build;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
 				PRODUCT_NAME = Soundflower;
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Development;
 		};
-		54D0ADA30A5E329B006380BD /* Deployment */ = {
+		9518872614B60E20004C4A69 /* Deployment */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2249EC7E0ED70C7E003C8357 /* Soundflower.xcconfig */;
 			buildSettings = {
-				ARCHS = (
-					x86_64,
-					i386,
-				);
-				COPY_PHASE_STRIP = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+			};
+			name = Deployment;
+		};
+		9518872714B60E20004C4A69 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
 				DEPLOYMENT_LOCATION = YES;
 				DSTROOT = "$(PROJECT_DIR)";
-				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
 				GCC_VERSION = "";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_GROUP = "$(GROUP)";
@@ -230,11 +211,6 @@
 				INSTALL_PATH = /../Build;
 				MODULE_NAME = com.Cycling74.driver.Soundflower;
 				PRODUCT_NAME = Soundflower;
-				WARNING_CFLAGS = (
-					"-Wmost",
-					"-Wno-four-char-constants",
-					"-Wno-unknown-pragmas",
-				);
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Deployment;
@@ -246,7 +222,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				548AD6D409CE873500241D17 /* Development */,
-				548AD6D509CE873500241D17 /* Deployment */,
+				9518872614B60E20004C4A69 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
@@ -255,7 +231,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				54D0ADA20A5E329B006380BD /* Development */,
-				54D0ADA30A5E329B006380BD /* Deployment */,
+				9518872714B60E20004C4A69 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
