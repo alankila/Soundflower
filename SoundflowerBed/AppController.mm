@@ -262,10 +262,9 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
             item.target = self;
             item.tag = dev->mID;
         }
-        delete dev;
     }
 	
-    item = [mMenu addItemWithTitle:@"Output device" action:Nil keyEquivalent:@""];
+    item = [mMenu addItemWithTitle:@"Output Device" action:Nil keyEquivalent:@""];
     item.submenu = m2chOutputDevice;
     
     NSMenuItem *bufItem = [mMenu addItemWithTitle:@"Buffer Size" action:Nil keyEquivalent:@""];
@@ -274,7 +273,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     m2chBuffer = [[NSMenu alloc] init];
     for (int i = 64; i < 4096; i *= 2) {
         item = [m2chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
-        [item setTarget:self];
+        item.target = self;
     }
     bufItem.submenu = m2chBuffer;
 
@@ -287,20 +286,24 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     m2chPreset = [[NSMenu alloc] init];
     for (int i = 0; i < 12; i ++) {
         item = [m2chPreset addItemWithTitle:presets[i] action:@selector(presetChanged:) keyEquivalent:@""];
-        [item setTarget:self];
+        item.target = self;
     }
+    [m2chPreset addItem:[NSMenuItem separatorItem]];
+    item = [m2chPreset addItemWithTitle:@"Custom..." action:@selector(showFrequencyResponseWindow:) keyEquivalent:@""];
+    item.target = self;
+    
     item = [mMenu addItemWithTitle:@"Equalizer" action:Nil keyEquivalent:@""];
     item.submenu = m2chPreset;
     
     m2chLoudness = [[NSMenu alloc] init];
     for (int i = 10; i <= 100; i += 10) {
         item = [m2chLoudness addItemWithTitle:[NSString stringWithFormat:@"%d dB", i] action:@selector(loudnessChanged:) keyEquivalent:@""];
-        [item setTarget:self];
+        item.target = self;
     }
-    item = [mMenu addItemWithTitle:@"Loudness compensation" action:Nil keyEquivalent:@""];
+    item = [mMenu addItemWithTitle:@"Loudness Compensation" action:Nil keyEquivalent:@""];
     item.submenu = m2chLoudness;
     
-    mCur2chVirtualizer = [mMenu addItemWithTitle:@"Headset virtualization" action:@selector(headsetSelected:) keyEquivalent:@""];
+    mCur2chVirtualizer = [mMenu addItemWithTitle:@"Headset Virtualization" action:@selector(headsetSelected:) keyEquivalent:@""];
     [mCur2chVirtualizer setTarget:self];
         
     [mMenu addItem:[NSMenuItem separatorItem]];
@@ -308,10 +311,10 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	item = [mMenu addItemWithTitle:@"Audio Setup..." action:@selector(doAudioSetup) keyEquivalent:@""];
 	[item setTarget:self];
 	
-	item = [mMenu addItemWithTitle:@"About Soundflowerbed..." action:@selector(doAbout) keyEquivalent:@""];
+	item = [mMenu addItemWithTitle:@"About DSP X..." action:@selector(doAbout) keyEquivalent:@""];
 	[item setTarget:self];
     
-	item = [mMenu addItemWithTitle:@"Quit Soundflowerbed" action:@selector(doQuit) keyEquivalent:@""];
+	item = [mMenu addItemWithTitle:@"Quit" action:@selector(doQuit) keyEquivalent:@""];
 	[item setTarget:self];
 
 	[mSbItem setMenu:mMenu];
@@ -351,19 +354,6 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     }
 }
 
-- (NSImage *)invert:(NSImage *)image {
-    return image;
-/* Will fix this to work later... Once I undertand where CIFilter is... :-/
-    CIImage* ciImage = [[CIImage alloc] initWithData:[image TIFFRepresentation]];
-    CIFilter* filter = [CIFilter filterWithName:@"CIColorInvert"];
-    [filter setDefaults];
-    [filter setValue:ciImage forKey:@"inputImage"];
-    CIImage* output = [filter valueForKey:@"outputImage"];
-    [output drawAtPoint:NSZeroPoint fromRect:NSRectFromCGRect([output extent]) operation:NSCompositeSourceOver fraction:1.0];
-    return [[NSImage alloc] initWithCGImage:output size:NSSizeFromCGSize(output.extent.size)];
-*/
-}
-
 - (void)awakeFromNib
 {
 	[[NSApplication sharedApplication] setDelegate:self];
@@ -373,8 +363,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	mSbItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
 	[mSbItem retain];
 	
-	mSbItem.image = [NSImage imageNamed:@"menuIcon"];
-    mSbItem.alternateImage = [self invert:mSbItem.image];
+	mSbItem.image = [NSImage imageNamed:@"menu.png"];
+    mSbItem.alternateImage = [NSImage imageNamed:@"menu-active.png"];
     mSbItem.highlightMode = YES;
 	[self buildMenu];
 	

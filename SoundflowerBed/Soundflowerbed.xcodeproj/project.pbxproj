@@ -12,10 +12,8 @@
 		222FE3350EBB6D9900FD13FC /* AudioThruEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = F591DDB60311589801FEEC38 /* AudioThruEngine.h */; };
 		222FE3370EBB6D9900FD13FC /* AudioRingBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = F591DDAD0310C0D001FEEC38 /* AudioRingBuffer.h */; };
 		222FE3380EBB6D9900FD13FC /* HelpWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = F57307580312E91E01FEEC38 /* HelpWindowController.h */; };
-		222FE33A0EBB6D9900FD13FC /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
+		222FE33A0EBB6D9900FD13FC /* HelpWindowController.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* HelpWindowController.nib */; };
 		222FE33B0EBB6D9900FD13FC /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
-		222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */; };
-		222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = C9CFAC1E06EFA390001BE11F /* appIcon.icns */; };
 		222FE3410EBB6D9900FD13FC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		222FE3420EBB6D9900FD13FC /* AppController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F591DD860310A6BE01FEEC38 /* AppController.mm */; };
 		222FE3430EBB6D9900FD13FC /* AudioRingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F591DDAE0310C0D001FEEC38 /* AudioRingBuffer.cpp */; };
@@ -33,6 +31,14 @@
 		9571CC3614B5111600569B69 /* EffectEqualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3214B5111600569B69 /* EffectEqualizer.h */; };
 		9571CC3714B5111600569B69 /* EffectVirtualizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */; };
 		9571CC3814B5111600569B69 /* EffectVirtualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3414B5111600569B69 /* EffectVirtualizer.h */; };
+		95F47F8914B65B5800359B86 /* FrequencyResponseView.h in Headers */ = {isa = PBXBuildFile; fileRef = 95F47F8714B65B5800359B86 /* FrequencyResponseView.h */; };
+		95F47F8A14B65B5800359B86 /* FrequencyResponseView.m in Sources */ = {isa = PBXBuildFile; fileRef = 95F47F8814B65B5800359B86 /* FrequencyResponseView.m */; };
+		95F47F9714B6638200359B86 /* FrequencyResponseWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */; };
+		95F47F9814B6638200359B86 /* FrequencyResponseWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 95F47F9514B6638200359B86 /* FrequencyResponseWindowController.m */; };
+		95F47F9914B6638200359B86 /* FrequencyResponseWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9614B6638200359B86 /* FrequencyResponseWindowController.xib */; };
+		95F47F9B14B6671900359B86 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9A14B6671900359B86 /* icon.png */; };
+		95F47F9E14B6681900359B86 /* menu-active.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9C14B6681900359B86 /* menu-active.png */; };
+		95F47F9F14B6681900359B86 /* menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 95F47F9D14B6681900359B86 /* menu.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,7 +46,7 @@
 		222FE3510EBB6D9900FD13FC /* Soundflowerbed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Soundflowerbed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		229B366F0EDC1DB500623222 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/HelpWindowController.nib; sourceTree = "<group>"; };
 		9518870514B511C7004C4A69 /* DelayLine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DelayLine.cpp; sourceTree = "<group>"; };
 		9518870614B511C7004C4A69 /* DelayLine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelayLine.h; sourceTree = "<group>"; };
 		9518871814B5CF1C004C4A69 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = ../../../../../System/Library/Frameworks/CoreAudio.framework; sourceTree = "<group>"; };
@@ -52,8 +58,14 @@
 		9571CC3214B5111600569B69 /* EffectEqualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectEqualizer.h; sourceTree = "<group>"; };
 		9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EffectVirtualizer.cpp; sourceTree = "<group>"; };
 		9571CC3414B5111600569B69 /* EffectVirtualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectVirtualizer.h; sourceTree = "<group>"; };
-		C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = menuIcon.tiff; sourceTree = "<group>"; };
-		C9CFAC1E06EFA390001BE11F /* appIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = appIcon.icns; sourceTree = "<group>"; };
+		95F47F8714B65B5800359B86 /* FrequencyResponseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyResponseView.h; sourceTree = "<group>"; };
+		95F47F8814B65B5800359B86 /* FrequencyResponseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyResponseView.m; sourceTree = "<group>"; };
+		95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyResponseWindowController.h; sourceTree = "<group>"; };
+		95F47F9514B6638200359B86 /* FrequencyResponseWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FrequencyResponseWindowController.m; sourceTree = "<group>"; };
+		95F47F9614B6638200359B86 /* FrequencyResponseWindowController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FrequencyResponseWindowController.xib; sourceTree = "<group>"; };
+		95F47F9A14B6671900359B86 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
+		95F47F9C14B6681900359B86 /* menu-active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu-active.png"; sourceTree = "<group>"; };
+		95F47F9D14B6681900359B86 /* menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu.png; sourceTree = "<group>"; };
 		F57307570312E91E01FEEC38 /* HelpWindowController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = HelpWindowController.m; sourceTree = "<group>"; };
 		F57307580312E91E01FEEC38 /* HelpWindowController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = HelpWindowController.h; sourceTree = "<group>"; };
 		F591DD850310A6BE01FEEC38 /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
@@ -92,8 +104,14 @@
 				F591DDAD0310C0D001FEEC38 /* AudioRingBuffer.h */,
 				F591DDB70311589801FEEC38 /* AudioThruEngine.cpp */,
 				F591DDB60311589801FEEC38 /* AudioThruEngine.h */,
+				95F47F8814B65B5800359B86 /* FrequencyResponseView.m */,
+				95F47F8714B65B5800359B86 /* FrequencyResponseView.h */,
+				95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */,
+				95F47F9514B6638200359B86 /* FrequencyResponseWindowController.m */,
+				95F47F9614B6638200359B86 /* FrequencyResponseWindowController.xib */,
 				F57307580312E91E01FEEC38 /* HelpWindowController.h */,
 				F57307570312E91E01FEEC38 /* HelpWindowController.m */,
+				29B97318FDCFA39411CA2CEA /* HelpWindowController.nib */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -131,9 +149,9 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				C9CFAC1E06EFA390001BE11F /* appIcon.icns */,
-				C9CCA5E806ED143E0076FAC2 /* menuIcon.tiff */,
-				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				95F47F9C14B6681900359B86 /* menu-active.png */,
+				95F47F9D14B6681900359B86 /* menu.png */,
+				95F47F9A14B6671900359B86 /* icon.png */,
 				229B366F0EDC1DB500623222 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 			);
@@ -171,6 +189,8 @@
 				9571CC3614B5111600569B69 /* EffectEqualizer.h in Headers */,
 				9571CC3814B5111600569B69 /* EffectVirtualizer.h in Headers */,
 				9518870814B511C7004C4A69 /* DelayLine.h in Headers */,
+				95F47F8914B65B5800359B86 /* FrequencyResponseView.h in Headers */,
+				95F47F9714B6638200359B86 /* FrequencyResponseWindowController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,10 +245,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				222FE33A0EBB6D9900FD13FC /* MainMenu.nib in Resources */,
+				222FE33A0EBB6D9900FD13FC /* HelpWindowController.nib in Resources */,
 				222FE33B0EBB6D9900FD13FC /* InfoPlist.strings in Resources */,
-				222FE33E0EBB6D9900FD13FC /* menuIcon.tiff in Resources */,
-				222FE33F0EBB6D9900FD13FC /* appIcon.icns in Resources */,
+				95F47F9914B6638200359B86 /* FrequencyResponseWindowController.xib in Resources */,
+				95F47F9B14B6671900359B86 /* icon.png in Resources */,
+				95F47F9E14B6681900359B86 /* menu-active.png in Resources */,
+				95F47F9F14B6681900359B86 /* menu.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,6 +271,8 @@
 				9571CC3514B5111600569B69 /* EffectEqualizer.cpp in Sources */,
 				9571CC3714B5111600569B69 /* EffectVirtualizer.cpp in Sources */,
 				9518870714B511C7004C4A69 /* DelayLine.cpp in Sources */,
+				95F47F8A14B65B5800359B86 /* FrequencyResponseView.m in Sources */,
+				95F47F9814B6638200359B86 /* FrequencyResponseWindowController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,12 +287,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
+		29B97318FDCFA39411CA2CEA /* HelpWindowController.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
-			name = MainMenu.nib;
+			name = HelpWindowController.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

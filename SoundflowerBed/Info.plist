@@ -7,9 +7,9 @@
 	<key>CFBundleExecutable</key>
 	<string>Soundflowerbed</string>
 	<key>CFBundleIconFile</key>
-	<string>appIcon.icns</string>
+	<string>icon.png</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.cycling74.Soundflowerbed</string>
+	<string>fi.bel.DSPX</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
@@ -23,7 +23,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music</string>
 	<key>NSMainNibFile</key>
-	<string>MainMenu</string>
+	<string>HelpWindowController</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSUIElement</key>
