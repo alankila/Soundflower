@@ -274,9 +274,10 @@ MySleepCallBack(void * x, io_service_t y, natural_t messageType, void * messageA
     }
     bufItem.submenu = m2chBuffer;
 
+    /* Keep synced with presetChanged: */
     NSString *presets[] = {
         @"Flat", 
-        @"Acoustic", @"Bass Booster", @"Bass reducer", @"Classical", @"Deep", @"R&B",
+        @"Acoustic", @"Bass Booster", @"Bass Reducer", @"Classical", @"Deep", @"R&B",
         @"Rock", @"Small Speakers", @"Treble Booster", @"Treble Reducer", @"Vocal Booster"
     };
     m2chPreset = [[NSMenu alloc] init];
