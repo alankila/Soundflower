@@ -11,12 +11,15 @@
 @implementation FrequencyResponseWindowController
 
 - (void)awakeFromNib {
-    
+    [super awakeFromNib];
 }
 
-- (void)doFrequencyResponseWindow {
-	[self showWindow:[self window]];
-	[NSApp activateIgnoringOtherApps:YES];
+- (void)windowDidLoad {
+    [self retain];
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    [self release];
 }
 
 @end

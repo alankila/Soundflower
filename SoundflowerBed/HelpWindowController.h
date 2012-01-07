@@ -2,7 +2,6 @@
 
 @interface HelpWindowController : NSWindowController
 {
-	IBOutlet NSTextView *mTextView;
 }
 
 - (void)doAbout;

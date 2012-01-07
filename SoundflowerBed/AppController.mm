@@ -3,6 +3,7 @@
 
 #import "AppController.h"
 #import "AudioDevice.h"
+#import "FrequencyResponseWindowController.h"
 
 #include "AudioThruEngine.h"
 
@@ -463,6 +464,12 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     mCur2chPreset = sender;
     mCur2chPreset.state = NSOnState;
     [self equalizerChanged];    
+}
+
+- (IBAction)showFrequencyResponseWindow:(id)sender {
+    FrequencyResponseWindowController *frc = [[FrequencyResponseWindowController alloc] initWithWindowNibName:@"FrequencyResponseWindowController"];
+	[frc showWindow:sender];
+    [frc release];
 }
 
 - (IBAction)loudnessChanged:(id)sender

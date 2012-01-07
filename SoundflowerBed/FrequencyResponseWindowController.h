@@ -8,6 +8,16 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FrequencyResponseWindowController : NSWindowController
+#import "FrequencyResponseView.h"
+
+@interface FrequencyResponseWindowController : NSWindowController<NSWindowDelegate> {
+    IBOutlet FrequencyResponseView *responseView;
+    IBOutlet NSSlider *slider1;
+    IBOutlet NSSlider *slider2;
+    IBOutlet NSSlider *slider3;
+    IBOutlet NSSlider *slider4;
+    IBOutlet NSSlider *slider5;
+    IBOutlet NSSlider *slider6;
+}
 
 @end
