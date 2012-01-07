@@ -43,7 +43,7 @@
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		222FE3510EBB6D9900FD13FC /* Soundflowerbed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Soundflowerbed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		222FE3510EBB6D9900FD13FC /* DSP X.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DSP X.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		229B366F0EDC1DB500623222 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/HelpWindowController.nib; sourceTree = "<group>"; };
@@ -119,7 +119,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				222FE3510EBB6D9900FD13FC /* Soundflowerbed.app */,
+				222FE3510EBB6D9900FD13FC /* DSP X.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -197,9 +197,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		222FE3310EBB6D9900FD13FC /* Soundflowerbed */ = {
+		222FE3310EBB6D9900FD13FC /* DSP X */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 222FE34C0EBB6D9900FD13FC /* Build configuration list for PBXNativeTarget "Soundflowerbed" */;
+			buildConfigurationList = 222FE34C0EBB6D9900FD13FC /* Build configuration list for PBXNativeTarget "DSP X" */;
 			buildPhases = (
 				222FE3320EBB6D9900FD13FC /* Headers */,
 				222FE3390EBB6D9900FD13FC /* Resources */,
@@ -210,10 +210,10 @@
 			);
 			dependencies = (
 			);
-			name = Soundflowerbed;
+			name = "DSP X";
 			productInstallPath = "$(HOME)/Applications";
 			productName = AudioThru;
-			productReference = 222FE3510EBB6D9900FD13FC /* Soundflowerbed.app */;
+			productReference = 222FE3510EBB6D9900FD13FC /* DSP X.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -235,7 +235,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				222FE3310EBB6D9900FD13FC /* Soundflowerbed */,
+				222FE3310EBB6D9900FD13FC /* DSP X */,
 			);
 		};
 /* End PBXProject section */
@@ -317,7 +317,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				PRODUCT_NAME = Soundflowerbed;
+				PRODUCT_NAME = "DSP X";
 				SECTORDER_FLAGS = "";
 			};
 			name = Development;
@@ -328,7 +328,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = Info.plist;
-				PRODUCT_NAME = Soundflowerbed;
+				PRODUCT_NAME = "DSP X";
 				SECTORDER_FLAGS = "";
 			};
 			name = Deployment;
@@ -345,7 +345,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
 		};
-		222FE34C0EBB6D9900FD13FC /* Build configuration list for PBXNativeTarget "Soundflowerbed" */ = {
+		222FE34C0EBB6D9900FD13FC /* Build configuration list for PBXNativeTarget "DSP X" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				222FE34D0EBB6D9900FD13FC /* Development */,

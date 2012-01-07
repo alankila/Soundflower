@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
-	<string>Soundflowerbed</string>
+	<string>DSP X</string>
 	<key>CFBundleIconFile</key>
 	<string>dspx.icns</string>
 	<key>CFBundleIdentifier</key>
