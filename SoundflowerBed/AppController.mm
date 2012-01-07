@@ -363,8 +363,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	mSbItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
 	[mSbItem retain];
 	
-	mSbItem.image = [NSImage imageNamed:@"menu.png"];
-    mSbItem.alternateImage = [NSImage imageNamed:@"menu-active.png"];
+	mSbItem.image = [NSImage imageNamed:@"dspx-menu.png"];
+    mSbItem.alternateImage = [NSImage imageNamed:@"dspx-menu-active.png"];
     mSbItem.highlightMode = YES;
 	[self buildMenu];
 	
