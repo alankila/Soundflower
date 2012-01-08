@@ -12,6 +12,8 @@
 #import "FrequencyResponseView.h"
 
 @interface FrequencyResponseWindowController : NSWindowController<NSWindowDelegate> {
+    IBOutlet NSWindow *window;
+    
     IBOutlet FrequencyResponseView *responseView;
     IBOutlet NSSlider *slider1;
     IBOutlet NSSlider *slider2;
