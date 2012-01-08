@@ -455,18 +455,36 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
             eq = true;
         }
     }
+    
     mThruEngine2->SetEqualizer(loudnessCorrection != 100 || eq, mEqualizerLevels, loudnessCorrection);
+
+    bool isCustom = true;
+    for (NSMenuItem *item in m2chPreset.itemArray) {
+        item.state = NSOffState;
+    }
+    for (int i = 0; i < 12; i ++) {
+        bool match = true;
+        for (int j = 0; j < 6; j ++) {
+            if (mEqualizerLevels[j] != presets[i][j]) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            mCur2chPreset = [m2chPreset itemAtIndex:i];
+            mCur2chPreset.state = NSOnState;
+            isCustom = false;
+            break;
+        }
+    }
+    if (isCustom) {
+        [m2chPreset itemAtIndex:13].state = NSOnState;
+    }
 }
 
 - (IBAction)presetChanged:(id)sender
 {
-    for (NSMenuItem *item in m2chPreset.itemArray) {
-        item.state = NSOffState;
-    }
-    mCur2chPreset = sender;
-    mCur2chPreset.state = NSOnState;
-
-    NSInteger preset = [m2chPreset indexOfItem:mCur2chPreset];
+    NSInteger preset = [sender tag];
     if (preset < 0 && preset >= 12) {
         return;
     }
@@ -544,19 +562,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     }
     
     /* Now scan for matching preset. */
-    for (int i = 0; i < 12; i ++) {
-        bool match = true;
-        for (int j = 0; j < 6; j ++) {
-            if (mEqualizerLevels[j] != presets[i][j]) {
-                match = false;
-                break;
-            }
-        }
-        if (match) {
-            [self presetChanged:[m2chPreset itemAtIndex:i]];
-            break;
-        }
-    }
+    [self updateEqualizer];
 }
 		
 - (void)writeGlobalPrefs

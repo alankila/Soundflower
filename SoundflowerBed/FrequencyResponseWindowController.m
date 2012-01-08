@@ -24,13 +24,22 @@
         sl[i].frame = n;
     }
     
-    NSTextField *tv[5] = { labelm12, labelm6, label0, labelp6, labelp12 };
+    NSTextField *db[5] = { labelm12, labelm6, label0, labelp6, labelp12 };
     for (int i = 0; i < 5; i ++) {
-        float dB = -12 + 6 * i;
-        float pos = [responseView projectY:dB];
-        NSRect f = tv[i].frame;
-        NSRect n = { 0, pos, f.size.width, f.size.height };
-        tv[i].frame = n;
+        float value = -12 + 6 * i;
+        float pos = [responseView projectY:value];
+        NSRect f = db[i].frame;
+        NSRect n = { 0, pos - f.size.height, f.size.width, f.size.height };
+        db[i].frame = n;
+    }
+    
+    NSTextField *hz[4] = { labelHz10, labelHz100, labelHz1000, labelHz10000 };
+    for (int i = 0; i < 4; i ++) {
+        float freq = powf(10, i + 1);
+        float pos = [responseView projectX:freq];
+        NSRect f = hz[i].frame;
+        NSRect n = { pos, 0, f.size.width, f.size.height };
+        hz[i].frame = n;
     }
 }
 

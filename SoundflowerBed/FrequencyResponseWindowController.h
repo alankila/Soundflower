@@ -28,6 +28,11 @@
     IBOutlet NSTextField *labelm6;
     IBOutlet NSTextField *labelm12;
     
+    IBOutlet NSTextField *labelHz10;
+    IBOutlet NSTextField *labelHz100;
+    IBOutlet NSTextField *labelHz1000;
+    IBOutlet NSTextField *labelHz10000;
+    
     double mLevels[6];
     id<FrequencyResponseDelegate> delegate;
 }
