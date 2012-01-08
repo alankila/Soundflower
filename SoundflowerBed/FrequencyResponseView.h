@@ -9,9 +9,12 @@
 #import <Cocoa/Cocoa.h>
 
 @interface FrequencyResponseView : NSView {
-    float levels[6];
+    double levels[6];
 }
 
-- (void)setLevel:(float)level forBand:(int)band;
+- (double)getLevel:(int)band;
+- (void)setLevel:(double)level forBand:(int)band;
+- (float)projectX:(float)x;
+- (float)projectY:(float)y;
 
 @end

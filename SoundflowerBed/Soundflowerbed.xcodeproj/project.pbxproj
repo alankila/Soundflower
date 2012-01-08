@@ -31,6 +31,7 @@
 		9571CC3614B5111600569B69 /* EffectEqualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3214B5111600569B69 /* EffectEqualizer.h */; };
 		9571CC3714B5111600569B69 /* EffectVirtualizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */; };
 		9571CC3814B5111600569B69 /* EffectVirtualizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9571CC3414B5111600569B69 /* EffectVirtualizer.h */; };
+		95A2DD0414BA10F8004DDFFA /* FrequencyResponseDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 95A2DD0314BA10F8004DDFFA /* FrequencyResponseDelegate.h */; };
 		95CFE1FF14B880D800C48AC1 /* dspx.icns in Resources */ = {isa = PBXBuildFile; fileRef = 95CFE1FE14B880D800C48AC1 /* dspx.icns */; };
 		95CFE20214B8856B00C48AC1 /* dspx-menu-active.png in Resources */ = {isa = PBXBuildFile; fileRef = 95CFE20014B8856B00C48AC1 /* dspx-menu-active.png */; };
 		95CFE20314B8856B00C48AC1 /* dspx-menu.png in Resources */ = {isa = PBXBuildFile; fileRef = 95CFE20114B8856B00C48AC1 /* dspx-menu.png */; };
@@ -58,6 +59,7 @@
 		9571CC3214B5111600569B69 /* EffectEqualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectEqualizer.h; sourceTree = "<group>"; };
 		9571CC3314B5111600569B69 /* EffectVirtualizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EffectVirtualizer.cpp; sourceTree = "<group>"; };
 		9571CC3414B5111600569B69 /* EffectVirtualizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EffectVirtualizer.h; sourceTree = "<group>"; };
+		95A2DD0314BA10F8004DDFFA /* FrequencyResponseDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrequencyResponseDelegate.h; sourceTree = "<group>"; };
 		95CFE1FE14B880D800C48AC1 /* dspx.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = dspx.icns; sourceTree = "<group>"; };
 		95CFE20014B8856B00C48AC1 /* dspx-menu-active.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dspx-menu-active.png"; sourceTree = "<group>"; };
 		95CFE20114B8856B00C48AC1 /* dspx-menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dspx-menu.png"; sourceTree = "<group>"; };
@@ -104,6 +106,7 @@
 				F591DDAD0310C0D001FEEC38 /* AudioRingBuffer.h */,
 				F591DDB70311589801FEEC38 /* AudioThruEngine.cpp */,
 				F591DDB60311589801FEEC38 /* AudioThruEngine.h */,
+				95A2DD0314BA10F8004DDFFA /* FrequencyResponseDelegate.h */,
 				95F47F8814B65B5800359B86 /* FrequencyResponseView.m */,
 				95F47F8714B65B5800359B86 /* FrequencyResponseView.h */,
 				95F47F9414B6638200359B86 /* FrequencyResponseWindowController.h */,
@@ -191,6 +194,7 @@
 				9518870814B511C7004C4A69 /* DelayLine.h in Headers */,
 				95F47F8914B65B5800359B86 /* FrequencyResponseView.h in Headers */,
 				95F47F9714B6638200359B86 /* FrequencyResponseWindowController.h in Headers */,
+				95A2DD0414BA10F8004DDFFA /* FrequencyResponseDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

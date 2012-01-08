@@ -3,11 +3,23 @@
 
 #import "AppController.h"
 #import "AudioDevice.h"
-#import "FrequencyResponseWindowController.h"
-
-#include "AudioThruEngine.h"
 
 @implementation AppController
+
+static const float presets[][6] = {
+    { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },     // Flat
+    { 4.5, 4.5, 3.5, 1.75, 3.5, 2.5 },    // Acoustic
+    { 6.5, 6.5, 4.0, 0.0, 0.0, 0.0 },     // Bass Booster
+    { -6.5, -6.5, -4.0, 0.0, 0.0, 0.0 },  // Bass Reducer
+    { 4.0, 4.0, 3.25, -0.5, 2.0, 3.5 },   // Classical
+    { 4.0, 4.0, 0.5, 1.5, -4.0, -4.5 },   // Deep
+    { 5.5, 5.5, 3.5, -1.75, 1.5, 2.5 },   // R&B
+    { 4.5, 4.5, 2.75, -0.5, 2.75, 4.0 },  // Rock
+    { 6.5, 6.5, 4.0, 0.0, -6.5, -4.0 },   // Small Speakers
+    { 0.0, 0.0, 0.0, 0.0, 4.0, 6.5 },     // Treble Booster
+    { 0.0, 0.0, 0.0, 0.0, -6.5, -4.0 },   // Treble Reducer
+    { -2.5, -2.5, 0.0, 3.5, 1.5, -2.0 },  // Vocal Booster
+};
 
 OSStatus	DeviceListenerProc (	AudioObjectID           inDevice,
                                     UInt32                  inNumberAddress,
@@ -223,7 +235,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 {
 	mSoundflower2Device = 0;
 	mSuspended2chDevice = Nil;
-	
+    mFrequencyResponseController = [[FrequencyResponseWindowController alloc] initWithWindowNibName:@"FrequencyResponseWindowController"];
+    [mFrequencyResponseController setEqualizerDelegate:self];
 	return self;
 }
 
@@ -240,6 +253,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 	}
     delete mThruEngine2;
     mThruEngine2 = NULL;
+    [mFrequencyResponseController release];
 	[super dealloc];
 }
 
@@ -273,7 +287,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     
     m2chBuffer = [[NSMenu alloc] init];
     for (int i = 64; i < 4096; i *= 2) {
-        item = [m2chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d", i] action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
+        item = [m2chBuffer addItemWithTitle:[NSString stringWithFormat:@"%d frames", i] action:@selector(bufferSizeChanged2ch:) keyEquivalent:@""];
+        item.tag = i;
         item.target = self;
     }
     bufItem.submenu = m2chBuffer;
@@ -287,10 +302,12 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     m2chPreset = [[NSMenu alloc] init];
     for (int i = 0; i < 12; i ++) {
         item = [m2chPreset addItemWithTitle:presets[i] action:@selector(presetChanged:) keyEquivalent:@""];
+        item.tag = i;
         item.target = self;
     }
     [m2chPreset addItem:[NSMenuItem separatorItem]];
     item = [m2chPreset addItemWithTitle:@"Custom..." action:@selector(showFrequencyResponseWindow:) keyEquivalent:@""];
+    item.tag = -1;
     item.target = self;
     
     item = [mMenu addItemWithTitle:@"Equalizer" action:Nil keyEquivalent:@""];
@@ -299,6 +316,7 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     m2chLoudness = [[NSMenu alloc] init];
     for (int i = 10; i <= 100; i += 10) {
         item = [m2chLoudness addItemWithTitle:[NSString stringWithFormat:@"%d dB", i] action:@selector(loudnessChanged:) keyEquivalent:@""];
+        item.tag = i;
         item.target = self;
     }
     item = [mMenu addItemWithTitle:@"Loudness Compensation" action:Nil keyEquivalent:@""];
@@ -407,9 +425,8 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     mCur2chBuffer = sender;
     mCur2chBuffer.state = NSOnState;
 
-	UInt32 size = [[sender title] intValue];
-    NSLog(@"2ch buffer: %@", [sender title]);
-	mThruEngine2->SetBufferSize(size);
+    NSLog(@"2ch buffer: %@", mCur2chBuffer.title);
+    mThruEngine2->SetBufferSize(mCur2chBuffer.tag);
 }
 
 - (IBAction)outputDeviceSelected:(id)sender
@@ -430,30 +447,15 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     mThruEngine2->SetVirtualizer(mCur2chVirtualizer.state, 500);
 }
 
-- (void)equalizerChanged
-{
-    float presets[][6] = {
-        { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },     // Flat
-        { 4.5, 4.5, 3.5, 1.75, 3.5, 2.5 },    // Acoustic
-        { 6.5, 6.5, 4.0, 0.0, 0.0, 0.0 },     // Bass Booster
-        { -6.5, -6.5, -4.0, 0.0, 0.0, 0.0 },  // Bass Reducer
-        { 4.0, 4.0, 3.25, -0.5, 2.0, 3.5 },   // Classical
-        { 4.0, 4.0, 0.5, 1.5, -4.0, -4.5 },   // Deep
-        { 5.5, 5.5, 3.5, -1.75, 1.5, 2.5 },   // R&B
-        { 4.5, 4.5, 2.75, -0.5, 2.75, 4.0 },  // Rock
-        { 6.5, 6.5, 4.0, 0.0, -6.5, -4.0 },   // Small Speakers
-        { 0.0, 0.0, 0.0, 0.0, 4.0, 6.5 },     // Treble Booster
-        { 0.0, 0.0, 0.0, 0.0, -6.5, -4.0 },   // Treble Reducer
-        { -2.5, -2.5, 0.0, 3.5, 1.5, -2.0 },  // Vocal Booster
-    };
-    
-    NSInteger preset = [m2chPreset indexOfItem:mCur2chPreset];
-    if (preset < 0) {
-        preset = 0;
+- (void)updateEqualizer {
+    int loudnessCorrection = mCur2chLoudness.tag;
+    bool eq = false;
+    for (int i = 0; i < 6; i ++) {
+        if (fabsf(mEqualizerLevels[i]) > 1e-2f) {
+            eq = true;
+        }
     }
-    int loudnessCorrection = mCur2chLoudness.title.intValue;
-    NSLog(@"Equalizer: preset: %@, loudness level: %@", mCur2chPreset.title, mCur2chLoudness.title);
-    mThruEngine2->SetEqualizer(loudnessCorrection != 100 || preset != 0, presets[preset], loudnessCorrection);
+    mThruEngine2->SetEqualizer(loudnessCorrection != 100 || eq, mEqualizerLevels, loudnessCorrection);
 }
 
 - (IBAction)presetChanged:(id)sender
@@ -463,13 +465,17 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     }
     mCur2chPreset = sender;
     mCur2chPreset.state = NSOnState;
-    [self equalizerChanged];    
-}
 
-- (IBAction)showFrequencyResponseWindow:(id)sender {
-    FrequencyResponseWindowController *frc = [[FrequencyResponseWindowController alloc] initWithWindowNibName:@"FrequencyResponseWindowController"];
-	[frc showWindow:sender];
-    [frc release];
+    NSInteger preset = [m2chPreset indexOfItem:mCur2chPreset];
+    if (preset < 0 && preset >= 12) {
+        return;
+    }
+    
+    for (int i = 0; i < 6; i ++) {
+        mEqualizerLevels[i] = presets[preset][i];
+    }
+    [mFrequencyResponseController setLevels:mEqualizerLevels];
+    [self updateEqualizer];
 }
 
 - (IBAction)loudnessChanged:(id)sender
@@ -479,29 +485,39 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     }
     mCur2chLoudness = sender;
     mCur2chLoudness.state = NSOnState;
-    [self equalizerChanged];
+    [self updateEqualizer];
+}
+
+- (IBAction)showFrequencyResponseWindow:(id)sender {
+	[mFrequencyResponseController showWindow:sender];
+}
+
+- (void)frequencyResponseChanged:(float)dB forBand:(int)band {
+    mEqualizerLevels[band] = dB;
+    [self updateEqualizer];
 }
 
 - (void)readGlobalPrefs
 {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
-    NSString *v;
+    NSString *s;
+    NSNumber *n;
     NSMenuItem *item;
     
-    v = [defaults objectForKey:@"2ch"];
-    if (! v) {
-        v = [m2chOutputDevice itemAtIndex:0].title;
+    s = [defaults objectForKey:@"2ch"];
+    if (! s) {
+        s = [m2chOutputDevice itemAtIndex:0].title;
     }
-    item = [m2chOutputDevice itemWithTitle:v];
+    item = [m2chOutputDevice itemWithTitle:s];
     [self outputDeviceSelected:item];
 
-	v = [defaults objectForKey:@"2chBuf"];
-    if (! v) {
-        v = @"512";
+	n = [defaults objectForKey:@"2chBuf"];
+    if (! n) {
+        n = [NSNumber numberWithInt:512];
     }
-    [self bufferSizeChanged2ch:[m2chBuffer itemWithTitle:v]];
+    [self bufferSizeChanged2ch:[m2chBuffer itemWithTag:n.intValue]];
 	
-    NSNumber *n = [defaults objectForKey:@"virtualizer"];
+    n = [defaults objectForKey:@"virtualizer"];
     if (! n) {
         n = [NSNumber numberWithInt:1];
     }
@@ -509,27 +525,53 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     mCur2chVirtualizer.state = n.intValue ? NSOffState : NSOnState;
     [self headsetSelected:mCur2chVirtualizer];
 
-    v = [defaults objectForKey:@"loudness"];
-    if (! v) {
-        v = @"100 dB";
+    n = [defaults objectForKey:@"loudness"];
+    if (! n) {
+        n = [NSNumber numberWithInt:100];
     }
-    [self loudnessChanged:[m2chLoudness itemWithTitle:v]];
+    [self loudnessChanged:[m2chLoudness itemWithTag:n.intValue]];
 
-    v = [defaults objectForKey:@"preset"];
-    if (! v) {
-        v = @"Flat";
+    NSArray *a = [defaults objectForKey:@"equalizer"];
+    if (a) {
+        for (int i = 0; i < 6; i ++) {
+            NSNumber *n = [a objectAtIndex:i];
+            mEqualizerLevels[i] = n.floatValue;
+        }
+    } else {
+        for (int i = 0; i < 6; i ++) {
+            mEqualizerLevels[i] = 0;
+        }
     }
-    [self presetChanged:[m2chPreset itemWithTitle:v]];
+    
+    /* Now scan for matching preset. */
+    for (int i = 0; i < 12; i ++) {
+        bool match = true;
+        for (int j = 0; j < 6; j ++) {
+            if (mEqualizerLevels[j] != presets[i][j]) {
+                match = false;
+                break;
+            }
+        }
+        if (match) {
+            [self presetChanged:[m2chPreset itemAtIndex:i]];
+            break;
+        }
+    }
 }
 		
 - (void)writeGlobalPrefs
 {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
     [defaults setObject:mCur2chDevice.title forKey:@"2ch"];
-    [defaults setObject:mCur2chBuffer.title forKey:@"2chBuf"];
+    [defaults setObject:[NSNumber numberWithInt:mCur2chBuffer.tag] forKey:@"2chBuf"];
     [defaults setObject:[NSNumber numberWithInt:mCur2chVirtualizer.state] forKey:@"virtualizer"];
-    [defaults setObject:mCur2chLoudness.title forKey:@"loudness"];
-    [defaults setObject:mCur2chPreset.title forKey:@"preset"];
+    [defaults setObject:[NSNumber numberWithInt:mCur2chLoudness.tag] forKey:@"loudness"];
+    NSMutableArray *levels = [[NSMutableArray alloc] init];
+    for (int i = 0; i < 6; i ++) {
+        [levels addObject:[NSNumber numberWithFloat:mEqualizerLevels[i]]];
+    }
+    [defaults setObject:levels forKey:@"equalizer"];
+    [levels release];
     [defaults synchronize];
 }
 

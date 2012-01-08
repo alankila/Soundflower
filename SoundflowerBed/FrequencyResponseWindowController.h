@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "FrequencyResponseDelegate.h"
 #import "FrequencyResponseView.h"
 
 @interface FrequencyResponseWindowController : NSWindowController<NSWindowDelegate> {
@@ -18,6 +19,20 @@
     IBOutlet NSSlider *slider4;
     IBOutlet NSSlider *slider5;
     IBOutlet NSSlider *slider6;
+    
+    IBOutlet NSTextField *labelp12;
+    IBOutlet NSTextField *labelp6;
+    IBOutlet NSTextField *label0;
+    IBOutlet NSTextField *labelm6;
+    IBOutlet NSTextField *labelm12;
+    
+    double mLevels[6];
+    id<FrequencyResponseDelegate> delegate;
 }
+
+- (void)setEqualizerDelegate:(id<FrequencyResponseDelegate>)object;
+- (void)setLevels:(float *)levels;
+
+- (IBAction)sliderMoved:(id)sender;
 
 @end

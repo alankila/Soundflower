@@ -103,7 +103,7 @@ void Biquad::setLowPass(int32_t steps, double center_frequency, double sampling_
 
 float Biquad::process(float x0)
 {
-    float y0 = mB0 * x0
+    double y0 = mB0 * x0
         + mB1 * mX1
         + mB2 * mX2
         + mA1 * mY1

@@ -12,8 +12,10 @@
 
 #import "AudioThruEngine.h"
 #import "HelpWindowController.h"
+#import "FrequencyResponseDelegate.h"
+#import "FrequencyResponseWindowController.h"
 
-@interface AppController : NSObject<NSApplicationDelegate>
+@interface AppController : NSObject<NSApplicationDelegate, FrequencyResponseDelegate>
 {
 	NSStatusItem	*mSbItem;
     /* Top-level menu */
@@ -43,10 +45,13 @@
 	AudioObjectID	mSoundflower2Device;
     NSArray         *mOutputDeviceList;
 
+    float           mEqualizerLevels[6];
+    
 	AudioThruEngine *mThruEngine2;
     io_connect_t  root_port;
 
 	IBOutlet HelpWindowController *mAboutController;
+    FrequencyResponseWindowController *mFrequencyResponseController;
 }
 
 - (IBAction)suspend;

@@ -12,15 +12,20 @@
 
 @implementation FrequencyResponseView
 
-- (void)setLevel:(float)level forBand:(int)band {
+- (double)getLevel:(int)band {
+    return levels[band];
+}
+
+- (void)setLevel:(double)level forBand:(int)band {
     levels[band] = level;
+    [self setNeedsDisplay:YES];
 }
 
 - (double)computeTransfer:(complex double)z forBiquad:(double *)biquad {
     complex double z2 = z * z;
     complex double nom = biquad[0] + biquad[1] / z + biquad[2] / z2;
     complex double dem = biquad[3] + biquad[4] / z + biquad[5] / z2;
-    return abs(nom / dem);
+    return cabs(nom / dem);
 }
 
 - (float)projectY:(float)y {
@@ -100,7 +105,7 @@
     
     /* Now draw frequency response */
     NSBezierPath *path = [[NSBezierPath alloc] init];
-    for (double f = 10; f < 20000; f *= 1.1) {
+    for (double f = 10; f < 20000 * 1.1; f *= 1.1) {
         double nf = f / 44100 * 2 * M_PI;
         complex double omega = cos(nf) + sin(nf) * 1j;
         double f1 = [self computeTransfer:omega forBiquad:bq[0]];
