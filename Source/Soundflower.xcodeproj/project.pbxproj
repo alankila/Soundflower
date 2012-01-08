@@ -225,7 +225,7 @@
 				9518872614B60E20004C4A69 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Deployment;
 		};
 		54D0ADA10A5E329B006380BD /* Build configuration list for PBXNativeTarget "SoundflowerDriver" */ = {
 			isa = XCConfigurationList;
@@ -234,7 +234,7 @@
 				9518872714B60E20004C4A69 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Development;
+			defaultConfigurationName = Deployment;
 		};
 /* End XCConfigurationList section */
 	};
