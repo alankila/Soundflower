@@ -58,7 +58,7 @@
     for (int i = 10; i < 20000;) {
         float x = [self projectX:i];
         NSPoint p1 = { x, 0 }, p2 = { x, size.height };
-
+        
         float scale = log(i) / log(10);
         if (fabsf(scale - roundf(scale)) < 1e-10f) {
             [[NSColor blackColor] set];
@@ -84,6 +84,7 @@
     for (int i = 0; i < 5; i ++) {
         /* These are the parameters for a high shelf filter */
         double centerFrequency = 2 * 15.625 * pow(4, i);
+        /* FIXME: need sampling rate from audio driver */
         double samplingFrequency = 44100;
         double dbGain = levels[i + 1] - levels[i];
         double slope = 1;
@@ -106,6 +107,7 @@
     /* Now draw frequency response */
     NSBezierPath *path = [[NSBezierPath alloc] init];
     for (double f = 10; f < 20000 * 1.1; f *= 1.1) {
+        /* FIXME: need sampling rate from audio driver */
         double nf = f / 44100 * 2 * M_PI;
         complex double omega = cos(nf) + sin(nf) * 1j;
         double f1 = [self computeTransfer:omega forBiquad:bq[0]];
@@ -125,8 +127,18 @@
         }
     }
     [[NSColor redColor] set];
+    path.lineWidth = 2;
     [path stroke];
-    [path release];
+    
+    NSPoint bottomright = { size.width, 0 };
+    [path lineToPoint:bottomright];
+    NSPoint bottomleft = { 0, 0 };
+    [path lineToPoint:bottomleft];
+    [path closePath];
+
+    [[NSColor colorWithDeviceRed:0 green:0 blue:0 alpha:0.1] set];
+    [path fill];
+    [path release];    
 }
 
 @end
