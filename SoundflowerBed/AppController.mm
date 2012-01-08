@@ -488,34 +488,34 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
     NSString *v;
     NSMenuItem *item;
     
-    v = [defaults valueForKey:@"2ch"];
+    v = [defaults objectForKey:@"2ch"];
     if (! v) {
         v = [m2chOutputDevice itemAtIndex:0].title;
     }
     item = [m2chOutputDevice itemWithTitle:v];
     [self outputDeviceSelected:item];
 
-	v = [defaults valueForKey:@"2chBuf"];
+	v = [defaults objectForKey:@"2chBuf"];
     if (! v) {
         v = @"512";
     }
     [self bufferSizeChanged2ch:[m2chBuffer itemWithTitle:v]];
 	
-    v = [defaults valueForKey:@"virtualizer"];
-    if (! v) {
-        v = @"0";
+    NSNumber *n = [defaults objectForKey:@"virtualizer"];
+    if (! n) {
+        n = [NSNumber numberWithInt:1];
     }
     /* State will be flipped by headsetSelected, so it appears inverted here. */
-    mCur2chVirtualizer.state = v.intValue ? NSOffState : NSOnState;
+    mCur2chVirtualizer.state = n.intValue ? NSOffState : NSOnState;
     [self headsetSelected:mCur2chVirtualizer];
 
-    v = [defaults valueForKey:@"loudness"];
+    v = [defaults objectForKey:@"loudness"];
     if (! v) {
         v = @"100 dB";
     }
     [self loudnessChanged:[m2chLoudness itemWithTitle:v]];
 
-    v = [defaults valueForKey:@"preset"];
+    v = [defaults objectForKey:@"preset"];
     if (! v) {
         v = @"Flat";
     }
@@ -525,11 +525,11 @@ MySleepCallBack(void *x, io_service_t y, natural_t messageType, void *messageArg
 - (void)writeGlobalPrefs
 {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
-    [defaults setValue:mCur2chDevice.title forKey:@"2ch"];
-    [defaults setValue:mCur2chBuffer.title forKey:@"2chBuf"];
-    [defaults setValue:[NSString stringWithFormat:@"%ld", mCur2chVirtualizer.state] forKey:@"virtualizer"];
-    [defaults setValue:mCur2chLoudness.title forKey:@"loudness"];
-    [defaults setValue:mCur2chPreset.title forKey:@"preset"];
+    [defaults setObject:mCur2chDevice.title forKey:@"2ch"];
+    [defaults setObject:mCur2chBuffer.title forKey:@"2chBuf"];
+    [defaults setObject:[NSNumber numberWithInt:mCur2chVirtualizer.state] forKey:@"virtualizer"];
+    [defaults setObject:mCur2chLoudness.title forKey:@"loudness"];
+    [defaults setObject:mCur2chPreset.title forKey:@"preset"];
     [defaults synchronize];
 }
 
