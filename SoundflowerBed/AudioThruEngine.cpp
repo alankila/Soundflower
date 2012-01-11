@@ -43,6 +43,7 @@
 #include "AudioThruEngine.h"
 #include "AudioRingBuffer.h"
 #include <unistd.h>
+#include <fenv.h>
 
 #define USE_AUDIODEVICEREAD 0
 #if USE_AUDIODEVICEREAD
@@ -315,21 +316,27 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioObjectID			inDevice,
 				
 		UInt32 innchnls = This->mInputDevice.mFormat.mChannelsPerFrame;
 		
+        /* Denormal numbers to avoid very high cpu drain during quiet times
+         * (low-pass filters tend to invariably decay to denormals. */
+        fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+        
         for (UInt32 buf = 0; buf < outOutputData->mNumberBuffers; buf ++) {
 			UInt32 outnchnls = outOutputData->mBuffers[buf].mNumberChannels;
             
             if (innchnls != 2 && outnchnls != 2) {
                 continue;
             }
-            
+
             float *in = (float *) This->mWorkBuf;
             float *out = (float *) outOutputData->mBuffers[buf].mData;
 
             UInt32 frames = outOutputData->mBuffers[buf].mDataByteSize / (outnchnls * sizeof(float));
             for (UInt32 frame = 0; frame < frames; frame += 1) {
-                float l = in[0];
-                float r = in[1];
-                        
+                /* Effects are defined as double because the biquads
+                 * actually require double precision to function expectedly. */
+                double l = in[0];
+                double r = in[1];
+                
                 if (This->mVirtualizerEnabled) {
                     This->mEffectVirtualizer.process(l, r);
                 }
@@ -344,6 +351,8 @@ OSStatus AudioThruEngine::OutputIOProc (	AudioObjectID			inDevice,
                 out += 2;
             }
         }
+        
+        fesetenv(FE_DFL_ENV);
 		
 		This->mThruTime = delta;
 		

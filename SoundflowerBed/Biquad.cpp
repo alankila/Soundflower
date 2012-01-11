@@ -13,11 +13,11 @@ Biquad::~Biquad()
 
 void Biquad::setCoefficients(int32_t steps, double a0, double a1, double a2, double b0, double b1, double b2)
 {
-    float A1 = -a1 / a0;
-    float A2 = -a2 / a0;
-    float B0 = b0 / a0;
-    float B1 = b1 / a0;
-    float B2 = b2 / a0;
+    double A1 = -a1 / a0;
+    double A2 = -a2 / a0;
+    double B0 = b0 / a0;
+    double B1 = b1 / a0;
+    double B2 = b2 / a0;
 
     if (steps == 0) {
         mA1 = A1;
@@ -101,7 +101,7 @@ void Biquad::setLowPass(int32_t steps, double center_frequency, double sampling_
     setCoefficients(steps, a0, a1, a2, b0, b1, b2);
 }
 
-float Biquad::process(float x0)
+double Biquad::process(double x0)
 {
     double y0 = mB0 * x0
         + mB1 * mX1

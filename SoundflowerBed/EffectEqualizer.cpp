@@ -13,10 +13,10 @@ EffectEqualizer::EffectEqualizer()
 void EffectEqualizer::configure(double sampleRate) {
     mSamplingRate = sampleRate;
     /* 100 updates per second. */
-    mNextUpdateInterval = int32_t(mSamplingRate / 100.);
+    mNextUpdateInterval = int32_t(mSamplingRate / 100.0);
 }
 
-void EffectEqualizer::setBand(int32_t band, float dB) {
+void EffectEqualizer::setBand(int32_t band, double dB) {
     mBand[band] = dB;
 }
 
@@ -45,20 +45,20 @@ void EffectEqualizer::setLoudnessCorrection(int16_t dB) {
  * made for 100 dB or higher. User must configure a reference level that maps the
  * digital sound level against the audio.
  */
-float EffectEqualizer::getAdjustedBand(int32_t band) {
+double EffectEqualizer::getAdjustedBand(int32_t band) {
     /* 1st derived by linear extrapolation from (62.5, 28) to (20, 41) */
-    const float adj[6] = { 42.3, 28.0, 10.0, 0.0, -3.0, 8.0 };
+    const double adj[6] = { 42.3, 28.0, 10.0, 0.0, -3.0, 8.0 };
 
     /* The 15.625 band is not exposed externally, so first point is duplicated. */
-    float f = mBand[band];
+    double f = mBand[band];
 
     /* Add loudness adjustment */
-    float loudnessLevel = mLoudness + mLoudnessAdjustment;
-    if (loudnessLevel > 100.f) {
-        loudnessLevel = 100.f;
+    double loudnessLevel = mLoudness + mLoudnessAdjustment;
+    if (loudnessLevel > 100.0) {
+        loudnessLevel = 100.0;
     }
-    if (loudnessLevel < 20.f) {
-        loudnessLevel = 20.f;
+    if (loudnessLevel < 20.0) {
+        loudnessLevel = 20.0;
     }
     /* Maximum loudness = no adj (reference behavior at 100 dB) */
     loudnessLevel = (loudnessLevel - 20) / (100 - 20);
@@ -71,21 +71,21 @@ void EffectEqualizer::refreshBands()
 {
     for (int32_t band = 0; band < 5; band ++) {
         /* 15.625, 62.5, 250, 1000, 4000, 16000 */
-        float centerFrequency = 15.625f * powf(4, band);
-        float dB = getAdjustedBand(band + 1) - getAdjustedBand(band);
+        double centerFrequency = 15.625 * powf(4, band);
+        double dB = getAdjustedBand(band + 1) - getAdjustedBand(band);
 
-        float overallGain = band == 0 ? getAdjustedBand(0) : 0.0f;
+        double overallGain = band == 0 ? getAdjustedBand(0) : 0.0f;
 
-        mFilterL[band].setHighShelf(mNextUpdateInterval, centerFrequency * 2.0f, mSamplingRate, dB, 1.0f, overallGain);
-        mFilterR[band].setHighShelf(mNextUpdateInterval, centerFrequency * 2.0f, mSamplingRate, dB, 1.0f, overallGain);
+        mFilterL[band].setHighShelf(mNextUpdateInterval, centerFrequency * 2.0, mSamplingRate, dB, 1.0, overallGain);
+        mFilterR[band].setHighShelf(mNextUpdateInterval, centerFrequency * 2.0, mSamplingRate, dB, 1.0, overallGain);
     }
 }
 
-void EffectEqualizer::process(float& tmpL, float& tmpR)
+void EffectEqualizer::process(double& tmpL, double& tmpR)
 {
     if (mNextUpdate == 0) {
-        float signalPowerDb = logf(mPowerSquared / mNextUpdateInterval + 1e-10f) / logf(10.0f) * 10.0f;
-        signalPowerDb += 96.0f - 6.0f;
+        double signalPowerDb = log(mPowerSquared / mNextUpdateInterval + 1e-10) / log(10.0) * 10.0;
+        signalPowerDb += 96.0 - 6.0;
 
         /* Immediate rise-time, and linear 10 dB/s decay */
         if (mLoudness > signalPowerDb + 0.1) {
@@ -102,10 +102,8 @@ void EffectEqualizer::process(float& tmpL, float& tmpR)
     }
     mNextUpdate --;
 
-    /* Calculate signal loudness estimate.
-     * XXX: should we be independent per channel? */
-    float weight = tmpL + tmpR;
-    mPowerSquared += weight * weight;
+    /* Calculate signal loudness estimate. */
+    mPowerSquared += tmpL * tmpL + tmpR * tmpR;
 
     /* evaluate the other filters. */
     for (int32_t j = 0; j < 5; j ++) {

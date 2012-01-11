@@ -3,13 +3,13 @@
 #include <stdint.h>
 
 class DelayLine {
-    float* mState;
+    double* mState;
     int32_t mIndex;
     int32_t mLength;
 
     public:
     DelayLine();
     ~DelayLine();
-    void setParameters(float rate, float time);
-    float process(float x0);
+    void setParameters(double rate, double time);
+    double process(double x0);
 };

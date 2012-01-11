@@ -18,6 +18,6 @@ class Biquad {
     void setHighShelf(int32_t steps, double cf, double sf, double gaindB, double slope, double overallGain);
     void setBandPass(int32_t steps, double cf, double sf, double resonance);
     void setLowPass(int32_t steps, double cf, double sf, double resonance);
-    float process(float in);
+    double process(double in);
     void reset();
 };

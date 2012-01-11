@@ -10,10 +10,10 @@ EffectVirtualizer::EffectVirtualizer()
 
 void EffectVirtualizer::configure(double samplingRate) {
     /* Haas effect delay */
-    mReverbDelayL.setParameters(samplingRate, 0.025f);
-    mReverbDelayR.setParameters(samplingRate, 0.025f);
+    mReverbDelayL.setParameters(samplingRate, 0.025);
+    mReverbDelayR.setParameters(samplingRate, 0.025);
     /* the -3 dB point is around 650 Hz, giving about 300 us to work with */
-    mLocalization.setHighShelf(0, 800.0f, samplingRate, -11.0f, 0.72f, 0);
+    mLocalization.setHighShelf(0, 800.0, samplingRate, -11.0, 0.72, 0);
 
     mDelayDataL = 0;
     mDelayDataR = 0;
@@ -30,14 +30,14 @@ void EffectVirtualizer::refreshStrength()
     mWide = mStrength >= 500;
 
     /* -15 .. -5 dB */
-    mLevel = powf(10.0f, (mStrength / 100.0f - 15.0f) / 20.0f);
+    mLevel = pow(10.0, (mStrength / 100.0 - 15.0) / 20.0);
 }
 
-void EffectVirtualizer::process(float& dryL, float& dryR)
+void EffectVirtualizer::process(double& dryL, double& dryR)
 {
     /* calculate reverb wet into dataL, dataR */
-    float dataL = dryL;
-    float dataR = dryR;
+    double dataL = dryL;
+    double dataR = dryR;
 
     if (mDeep) {
         /* Note: a pinking filter here would be good. */
@@ -62,8 +62,8 @@ void EffectVirtualizer::process(float& dryL, float& dryR)
     dataL += dryL;
     dataR += dryR;
 
-    float center  = (dataL + dataR) * .5f;
-    float side = (dataL - dataR) * .5f;
+    double center  = (dataL + dataR) * .5;
+    double side = (dataL - dataR) * .5;
 
     side -= mLocalization.process(side);
     

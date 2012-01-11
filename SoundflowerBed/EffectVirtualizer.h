@@ -8,10 +8,10 @@ class EffectVirtualizer {
     int16_t mStrength;
 
     bool mDeep, mWide;
-    float mLevel;
+    double mLevel;
 
     DelayLine mReverbDelayL, mReverbDelayR;
-    float mDelayDataL, mDelayDataR;
+    double mDelayDataL, mDelayDataR;
     Biquad mLocalization;
 
     void refreshStrength();
@@ -22,5 +22,5 @@ class EffectVirtualizer {
     void configure(double sampleRate);
     void setStrength(int16_t strength);
 
-    void process(float& left, float& right);
+    void process(double& left, double& right);
 };

@@ -4,26 +4,26 @@
 
 class EffectEqualizer {
     private:
-    float mSamplingRate;
-    float mBand[6];
+    double mSamplingRate;
+    double mBand[6];
     Biquad mFilterL[5], mFilterR[5];
 
     /* Automatic equalizer */
-    float mLoudnessAdjustment;
+    double mLoudnessAdjustment;
 
-    float mLoudness;
+    double mLoudness;
     int32_t mNextUpdate;
     int32_t mNextUpdateInterval;
-    float mPowerSquared;
+    double mPowerSquared;
 
-    float getAdjustedBand(int32_t idx);
+    double getAdjustedBand(int32_t idx);
     void refreshBands();
 
     public:
     EffectEqualizer();
     
     void configure(double sampleRate);
-    void setBand(int32_t band, float dB);
+    void setBand(int32_t band, double dB);
     void setLoudnessCorrection(int16_t level);
-    void process(float& left, float& right);
+    void process(double& left, double& right);
 };

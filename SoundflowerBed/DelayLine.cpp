@@ -15,20 +15,20 @@ DelayLine::~DelayLine()
     }
 }
 
-void DelayLine::setParameters(float samplingFrequency, float time)
+void DelayLine::setParameters(double samplingFrequency, double time)
 {
     mLength = int32_t(time * samplingFrequency + 0.5f);
     if (mState != 0) {
         delete[] mState;
     }
-    mState = new float[mLength];
-    memset(mState, 0, mLength * sizeof(float));
+    mState = new double[mLength];
+    memset(mState, 0, mLength * sizeof(double));
     mIndex = 0;
 }
 
-float DelayLine::process(float x0)
+double DelayLine::process(double x0)
 {
-    float y0 = mState[mIndex];
+    double y0 = mState[mIndex];
     mState[mIndex] = x0;
     mIndex = (mIndex + 1) % mLength;
     return y0;
